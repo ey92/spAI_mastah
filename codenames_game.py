@@ -161,7 +161,7 @@ def createWordGrid():
 #Processes a guess made by an agent (the player) 
 #[NOTE: assumes from previous procedures that response exists in word_list]
 def processGuess(response):
-	# global word_grid
+	global word_grid
 	# global word_list
 	global blue_words
 	global red_words
@@ -177,6 +177,8 @@ def processGuess(response):
 
 	#Get identity of the word
 	word_identity = word_grid.get(response)
+	#Mark as guessed (make negative) for AI processing
+	word_grid.update({response:word_identity*-1})
 	#Mark a word as guessed
 	word_idx = word_list.index(response)
 	guessed[word_idx] = 1
