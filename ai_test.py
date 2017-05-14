@@ -31,12 +31,12 @@ test_grid5 = {'box': 1, 'yard': 2, 'spine': 2, 'watch': 3, 'antactica': 2, 'glov
 test_list6 = ['india', 'field', 'ground', 'life', 'mexico', 'deck', 'stick', 'canada', 'pan', 'bat', 'lap', 'bark', 'washington', 'cliff', 'organ', 'atlantis', 'heart', 'dwarf', 'angel', 'buck', 'space', 'grace', 'nail', 'germany', 'temple']
 test_grid6 = {'canada': 0, 'buck': 2, 'bat': 1, 'organ': 2, 'space': 0, 'india': 1, 'field': 0, 'temple': 0, 'pan': 2, 'heart': 0, 'life': 0, 'atlantis': 0, 'dwarf': 1, 'angel': 1, 'mexico': 1, 'deck': 1, 'washington': 3, 'nail': 2, 'germany': 0, 'stick': 2, 'bark': 2, 'ground': 0, 'lap': 2, 'grace': 1, 'cliff': 1}
 
-test_list7 = ['Stadium', 'Pit', 'Pool', 'Lap', 'Helicopter', 'Spell', 'Bolt', 'Sink', 'Life', 'Thumb', 'Octopus', 'Buffalo', 'Time', 'Crane', 'Scorpion', 'Brush', 'Face', 'Piano', 'Duck', 'Shot', 'Eye', 'Bed', 'Center', 'Angel', 'Button']
-test_grid7 = {'Pit': 2, 'Eye': 1, 'Thumb': 1, 'Button': 0, 'Scorpion': 2, 'Sink': 0, 'Bed': 0, 'Face': 0, 'Stadium': 2, 'Time': 1, 'Helicopter': 1, 'Piano': 2, 'Buffalo': 1, 'Center': 0, 'Life': 0, 'Shot': 2, 'Angel': 1, 'Octopus': 1, 'Spell': 2, 'Brush': 2, 'Duck': 0, 'Crane': 0, 'Lap': 3, 'Pool': 0, 'Bolt': 1}
+test_list7 = ['stadium', 'pit', 'pool', 'lap', 'helicopter', 'spell', 'bolt', 'sink', 'life', 'thumb', 'octopus', 'buffalo', 'time', 'crane', 'scorpion', 'brush', 'face', 'piano', 'duck', 'shot', 'eye', 'bed', 'center', 'angel', 'button']
+test_grid7 = {'pit': 2, 'eye': 1, 'thumb': 1, 'button': 0, 'scorpion': 2, 'sink': 0, 'bed': 0, 'face': 0, 'stadium': 2, 'time': 1, 'helicopter': 1, 'piano': 2, 'buffalo': 1, 'center': 0, 'life': 0, 'shot': 2, 'angel': 1, 'octopus': 1, 'spell': 2, 'brush': 2, 'duck': 0, 'crane': 0, 'lap': 3, 'pool': 0, 'bolt': 1}
 
 def getWords():
-	# grid_words = []
 	global word_list
+	#Assigned here incase of reset
 	word_list.clear()
 
 	with open(DICTIONARY_FILE,"r") as file:
@@ -57,16 +57,12 @@ def createWordGrid():
 	global word_list
 	global assasian_word
 
-	word_grid.clear()
-	##Get random set of words in a dictionary
-	
 	#Assigned here incase of reset
-	# word_grid = {} #GLOBAL
-	# word_list = [] #GLOBAL, resets for every game
+	word_grid.clear()
 
+	##Get random set of words in a dictionary
 	#Populates word_list
-	# word_list = getWords()	
-	# getWords()
+	getWords()
 
 	##Assign key as word w/ value as BLUE_TEAM, RED_TEAM, CIVILIAN, or ASSASIAN
 	assasian_num = 1
