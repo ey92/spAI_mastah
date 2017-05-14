@@ -48,6 +48,7 @@ CWHITEBG2  = '\33[107m'
 
 #format is color+bg+text+end
 # text = colored('hi','red','on_grey')
+<<<<<<< HEAD
 def colorprint(text,color,bg=None,bold=True):
 	if bold:
 		print(color+bg+CBOLD+text)
