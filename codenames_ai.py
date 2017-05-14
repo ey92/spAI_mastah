@@ -220,7 +220,7 @@ class spyAgent(spyPlayer):
 		
 		return not_guessed
 
-	def computeRocchio(word):
+	def computeRocchio(word_vec):
 		rel_words = self.rel_pool.get(word,[])
 		irrel_words = self.irrel_pool.get(word,[])
 		# mod_vec = np.empty([17000]) #TODO Replace
@@ -230,9 +230,10 @@ class spyAgent(spyPlayer):
 		
 		#Get sim vector for word, mult. by alpha term
 		# sim_vector = np.empty([17000]) #TODO Replace
-		sim_idx = self.bankword_to_idx.get(word)
-		sim_vector = self.sim_matrix[sim_idx]
-		alpha_term = ALPHA_ROCC*sim_vector
+		# sim_idx = self.bankword_to_idx.get(word)
+		# sim_vector = self.sim_matrix[sim_idx]
+		# sim_vector = word_vec #Sanity comprehension, 
+		alpha_term = ALPHA_ROCC*word_vec
 
 		#For each relevant word
 		for rel_word in rel_words:
@@ -276,7 +277,7 @@ class spyAgent(spyPlayer):
 		clue_vec = self.sim_matrix[clue_idx]
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue
-		mod_clue_vec = computeRocchio(clue) #clue_vec # TODO Rocchio
+		mod_clue_vec = computeRocchio(clue_vec) #clue_vec # TODO Rocchio
 
 		# print("Mod vector")
 		# print(mod_clue_vec)
