@@ -1,4 +1,3 @@
-# from termcolor import colored
 RED = '\x1b[1;31;40m'
 END = '\x1b[0m'
 CEND      = '\33[0m'
@@ -8,7 +7,9 @@ CURL      = '\33[4m'
 CBLINK    = '\33[5m'
 CBLINK2   = '\33[6m'
 CSELECTED = '\33[7m'
+HEADER = '\033[95m'
 
+CDARKBLACK = '1;30;47'
 CBLACK  = '\33[30m'
 CRED    = '\33[31m'
 CGREEN  = '\33[32m'
@@ -47,8 +48,13 @@ CWHITEBG2  = '\33[107m'
 
 #format is color+bg+text+end
 # text = colored('hi','red','on_grey')
-def colorprint(text,color,bg=None, bold=False):
+
+def colorprint(text,color,bg=None,bold=True):
 	if bold:
-		print(color+bg+CBOLD+text+END)
+		print(color+bg+CBOLD+text)
 	else:
-		print(color+bg+text+END)
+		print(color+bg+CBOLD+text)
+
+def endColor():
+	print(END)
+
