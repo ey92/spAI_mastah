@@ -157,12 +157,15 @@ class spyMaster(spyPlayer):
 		civ_num = 2
 		boom_num = 3
 
+		# print(type(word_grid))
+
 		for word in word_grid.keys():
 			word_id = word_grid.get(word)
-			if word_id == self.team_num: team_words.append(word)
-			elif word_id == opp_num: opp_words.append(word)
-			elif word_id == civ_num: civ_words.append(word)
-			elif word_id == boom_num: boom_word = word
+			mod_word = word.lower()
+			if word_id == self.team_num: team_words.append(mod_word)
+			elif word_id == opp_num: opp_words.append(mod_word)
+			elif word_id == civ_num: civ_words.append(mod_word)
+			elif word_id == boom_num: boom_word = mod_word
 			else: print("Why is there a "+word_id+" in the processing?!?!?")
 
 		return team_words, opp_words, civ_words, boom_word
@@ -171,46 +174,53 @@ class spyMaster(spyPlayer):
 		"""Creates a clue based off the state of the gameboard [word_grid]
 			word_grid: dictionary containing the "identity of each word"
 		"""
+		n = 50	# num similar words you care about
 		clue = ""
 		clue_num = 0
 
 		team_words, opp_words, civ_words, boom_word = self.interpretGameboard(word_grid)
 
 		#Find words most relevant to each other
-		team_indexs = [self.sim_matrix.get(x) for x in team_words]
-		opp_indexs = [self.sim_matrix.get(x) for x in opp_words]
-		civ_indexs = [self.sim_matrix.get(x) for x in civ_words]
-		boom_index = [self.sim_matrix.get(x) for x in boom_word]
+		team_indexs = [self.codeword_to_idx.get(x) for x in team_words]
+		opp_indexs = [self.codeword_to_idx.get(x) for x in opp_words]
+		civ_indexs = [self.codeword_to_idx.get(x) for x in civ_words]
+		boom_index = [self.codeword_to_idx.get(x) for x in boom_word]
 
 		top_team_idxs = []
 		top_opp_idxs = []
 		top_civ_idxs = []
-			sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
-		top_boom_idxs = sorted[:10]
+		sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
+		top_boom_idxs = sorted[:n]
 
-		ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
+		# ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
 		
 		# get top 5 similarity
-		for i in ind_max:
+		for i in range(9):
 			if i < len(team_indexs):
 				idx = team_indexs[i]
 				sorted = self.sim_matrix[idx].argsort()[::-1][:]
-				top_team_idxs.append(sorted[:10])
+				top_team_idxs.append(sorted[:n])
 			if i < len(opp_indexs):
 				idx = opp_indexs[i]
 				sorted = self.sim_matrix[idx].argsort()[::-1][:]
-				top_opp_idxs.append(sorted[:10])
+				top_opp_idxs.append(sorted[:n])
 			if i < len(civ_indexs):
 				idx = civ_indexs[i]
 				sorted = self.sim_matrix[idx].argsort()[::-1][:]
-				top_civ_idxs.append(sorted[:10])
+				top_civ_idxs.append(sorted[:n])
 
-		counts = np.zeros(10,10)
-		for i in range(10):
-			for j in range(10):
-				if top_team_idxs[i][j] in top_boom_idxs:
-					continue
-				for k in range(10):
+		counts = np.zeros([n,n])
+		# print(counts)
+		print(len(top_team_idxs))
+		print(len(top_opp_idxs))
+		print(len(top_civ_idxs))
+		print(len(top_boom_idxs))
+
+		for i in range(len(top_team_idxs)):
+			for j in range(n):
+				# if top_team_idxs[i][j] in top_boom_idxs:
+				# 	continue
+				for k in range(n):
 					if top_team_idxs[i][j] in top_team_idxs[k]:
 						counts[i][j]+=1
 					if top_team_idxs[i][j] in top_opp_idxs[k]:
@@ -219,10 +229,10 @@ class spyMaster(spyPlayer):
 						counts[i][j]-=0.5
 		# top indices for each word in team words
 		cts_idx = [np.argmax(z) for z in counts]
-		top_cts = [counts[i][cts_max[i]] for i in range(len(cts_max))]
+		top_cts = [counts[i][cts_idx[i]] for i in range(len(cts_idx))]
 		i = np.argmax(top_cts)
 		j = cts_idx[i]
-		clue = self.idx_to_bankword()[i][j]
+		clue = self.idx_to_bankword[j]
 
 		#Rocchio away the synonyms of the opp_words, civ_words, and boom_word
 		

@@ -31,18 +31,12 @@ test_grid5 = {'box': 1, 'yard': 2, 'spine': 2, 'watch': 3, 'antactica': 2, 'glov
 test_list6 = ['india', 'field', 'ground', 'life', 'mexico', 'deck', 'stick', 'canada', 'pan', 'bat', 'lap', 'bark', 'washington', 'cliff', 'organ', 'atlantis', 'heart', 'dwarf', 'angel', 'buck', 'space', 'grace', 'nail', 'germany', 'temple']
 test_grid6 = {'canada': 0, 'buck': 2, 'bat': 1, 'organ': 2, 'space': 0, 'india': 1, 'field': 0, 'temple': 0, 'pan': 2, 'heart': 0, 'life': 0, 'atlantis': 0, 'dwarf': 1, 'angel': 1, 'mexico': 1, 'deck': 1, 'washington': 3, 'nail': 2, 'germany': 0, 'stick': 2, 'bark': 2, 'ground': 0, 'lap': 2, 'grace': 1, 'cliff': 1}
 
-<<<<<<< HEAD
-def getWords():
-	# grid_words = []
-	global word_list
-=======
 test_list7 = ['stadium', 'pit', 'pool', 'lap', 'helicopter', 'spell', 'bolt', 'sink', 'life', 'thumb', 'octopus', 'buffalo', 'time', 'crane', 'scorpion', 'brush', 'face', 'piano', 'duck', 'shot', 'eye', 'bed', 'center', 'angel', 'button']
 test_grid7 = {'pit': 2, 'eye': 1, 'thumb': 1, 'button': 0, 'scorpion': 2, 'sink': 0, 'bed': 0, 'face': 0, 'stadium': 2, 'time': 1, 'helicopter': 1, 'piano': 2, 'buffalo': 1, 'center': 0, 'life': 0, 'shot': 2, 'angel': 1, 'octopus': 1, 'spell': 2, 'brush': 2, 'duck': 0, 'crane': 0, 'lap': 3, 'pool': 0, 'bolt': 1}
 
 def getWords():
 	global word_list
 	#Assigned here incase of reset
->>>>>>> master
 	word_list.clear()
 
 	with open(DICTIONARY_FILE,"r") as file:
