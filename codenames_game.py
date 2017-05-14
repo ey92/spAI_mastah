@@ -359,7 +359,64 @@ def getGuess(clue,clue_num):
 		print("The agents guessed: "+guess)
 		result = processGuess(guess,current_team)
 		# If endTurn==True
-		if result: num_guesses=0
+		if result: 
+			num_guesses=0
+		
+		#Teach AI
+
+		#Have agents account for their guess being related (or not) to the clue based on correctness
+		if current_team==BLUE_TEAM and not blue_spy_human:
+			query = clue.lower()
+			#If the guess was wrong, the two are probably not related
+			if result:
+				print("Blue thinks that was bad")
+				blue_ai_agent.addIrrelevantEntry(query,guess)
+				blue_ai_agent.addIrrelevantEntry(guess,query)
+			#If the guess was correct, the two are probably related
+			else:
+				print("Blue thinks that was good")
+				blue_ai_agent.addRelevantEntry(query,guess)
+				blue_ai_agent.addRelevantEntry(guess,query)
+
+		if current_team==RED_TEAM and not red_spy_human:
+			query = clue.lower()
+			#If the guess was wrong, the two are probably not related
+			if result:
+				print("Red thinks that was bad")
+				red_ai_agent.addIrrelevantEntry(query,guess)
+				red_ai_agent.addIrrelevantEntry(guess,query)
+			#If the guess was correct, the two are probably related
+			else:
+				print("Red thinks that was good")
+				red_ai_agent.addRelevantEntry(query,guess)
+				red_ai_agent.addRelevantEntry(guess,query)
+
+		#TODO Teach AI master based off what it was trying to get people to guess and the clue it gave
+		if current_team==BLUE_TEAM and not blue_master_human:
+			pass
+			# query = clue.lower() 
+			# Also get words that AI intended to be guessed, replaces guess in statement
+			# #If the guess was wrong, the two are probably not related
+			# if result:
+			# 	blue_ai_agent.addIrrelevantEntry(query,guess)
+			# 	blue_ai_agent.addIrrelevantEntry(guess,query)
+			# #If the guess was correct, the two are probably related
+			# else:
+			# 	blue_ai_agent.addRelevantEntry(query,guess)
+			# 	blue_ai_agent.addRelevantEntry(guess,query)
+
+		if current_team==RED_TEAM and not red_master_human:
+			pass
+			# query = clue.lower()
+			# Also get words that AI intended to be guessed, replaces guess in statement
+			# #If the guess was wrong, the two are probably not related
+			# if result:
+			# 	red_ai_agent.addIrrelevantEntry(query,guess)
+			# 	red_ai_agent.addIrrelevantEntry(guess,query)
+			# #If the guess was correct, the two are probably related
+			# else:
+			# 	red_ai_agent.addRelevantEntry(query,guess)
+			# 	red_ai_agent.addRelevantEntry(guess,query)
 
 
 	# if is_spy_master==False:
@@ -448,6 +505,25 @@ def endGame():
 	print("\t The assasian word was "+assasian_word)
 
 	#Check for win/lose conditions
+
+	#Have the AI save their Rocchios in case they were modified during the game
+
+	if not blue_master_human:
+		print("The blue spymaster is being dismissed...")
+		blue_ai_master.saveRocchios()
+
+	if not red_master_human:
+		print("The red spymaster is being dismissed...")
+		red_ai_master.saveRocchios()
+
+	if not blue_spy_human:
+		print("The blue agents are being dismissed...")
+		blue_ai_agent.saveRocchios()
+
+	if not red_spy_human:
+		print("The red agents are being dismissed...")
+		red_ai_agent.saveRocchios()
+	
 
 def gameLoop():
 	global current_team
