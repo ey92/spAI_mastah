@@ -1,6 +1,8 @@
 ### Created 04/17/2017 by Lauren Hsu and Elizabeth Yam
 import numpy as np 
 import rocchio as ro
+# import pickle
+import cPickle as pickle
 
 # CODENAMES_WORDLIST = "words_to_process.txt"
 BANKWORDS_PICKLE = "knowledge/idx_to_lemma.pickle"
@@ -27,7 +29,11 @@ class spyPlayer():
 		"""Returns a numpy array mapping Codename words to other possible words"""
 		sim_mat = np.empty([400,6459])
 		with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
-			sim_mat = pickle.load(f)
+			file = f.read()
+			# print(file)
+			sim_mat = pickle.loads(file)
+
+		# sim_mat = pickle.loads(SIM_PICKLE_HEAD+str("1")+".pickle")
 
 		return sim_mat
 		
@@ -37,12 +43,16 @@ class spyPlayer():
 		with open(RELEVANT_PICKLE,'rb') as f:
 			rel_dict = pickle.load(f)
 
+		# rel_dict = pickle.loads(RELEVANT_PICKLE)
+
 		return rel_dict
 
 	def generateIrrelRocchio(self):
 		irrel_dict = {}
 		with open(IRRELEVANT_PICKLE,'rb') as f:
 			irrel_dict = pickle.load(f)
+
+		# irrel_dict = pickle.loads(IRRELEVANT_PICKLE)
 
 		return irrel_dict
 
@@ -51,12 +61,16 @@ class spyPlayer():
 		with open(BANKWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
+		# wordmap = pickle.loads(BANKWORDS_PICKLE)
+
 		return wordmap
 
 	def generateInvertedBankWord(self):
 		wordmap = {}
 		with open(INVERTED_BANKWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
+
+		# wordmap = pickle.loads(INVERTED_BANKWORDS_PICKLE)
 
 		return wordmap
 
@@ -65,12 +79,16 @@ class spyPlayer():
 		with open(CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
+		# wordmap = pickle.loads(CODEWORDS_PICKLE)
+
 		return wordmap
 
 	def generateInvertedCodeWord(self):
 		wordmap = {}
 		with open(INVERTED_CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
+
+		# wordmap = pickle.loads(INVERTED_CODEWORDS_PICKLE)
 
 		return wordmap
 

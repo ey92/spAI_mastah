@@ -84,19 +84,22 @@ if __name__ == "__main__":
     with open('sim_matrix10.pickle', 'rb') as f:
         # MATRIX_NUM = 10
         print("This is sim_matrix10")
+        sim_matrix10 = pickle.load(f)
         # popMatrix(sim_matrix10,all_lemmas[58131+1:64590])
-        pickle.dump(sim_matrix10, , protocol=2f)
+        pickle.dump(sim_matrix10, open('sim_matrix10.pickle', 'wb'), protocol=2)
 
     # In[ ]:
     with open('sim_matrix11.pickle', 'rb') as f:
         # MATRIX_NUM = 11
         print("This is sim_matrix11")
+        sim_matrix11 = pickle.load(f)
         # popMatrix(sim_matrix11,all_lemmas[64590+1:71049])
-        pickle.dump(sim_matrix11, , protocol=2f)
+        pickle.dump(sim_matrix11, open('sim_matrix11.pickle', 'wb'), protocol=2)
 
     # In[ ]:
     with open('sim_matrix12.pickle', 'rb') as f:
         # MATRIX_NUM = 12
         print("This is sim_matrix12")
+        sim_matrix12 = pickle.load(f)
         # popMatrix(sim_matrix12,all_lemmas[71049+1:])
-        pickle.dump(sim_matrix12, , protocol=2f)
+        pickle.dump(sim_matrix12, open('sim_matrix12.pickle', 'wb'), protocol=2)
