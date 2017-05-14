@@ -19,8 +19,8 @@ class spyPlayer():
 		self.sim_matrix = self.generateSimMatrix()
 		self.rel_pool = self.generateRelRocchio()
 		self.irrel_pool = self.generateIrrelRocchio()
-		self.idx_to_bankword = self.generateBankWordMap()
-		self.bankword_to_idx = self.generateInvertedBankWord() 		# lemmas
+		self.idx_to_bankword = self.generateBankWordMap()			# dict {key = idx, value = "word"}
+		self.bankword_to_idx = self.generateInvertedBankWord() 		# dict {"key = word", value = idx}
 		self.idx_to_codeword = self.generateCodeWordMap()
 		self.codeword_to_idx = self.generateInvertedCodeWord()		# dict {"key = word", value = idx}
 
@@ -152,34 +152,57 @@ class spyMaster(spyPlayer):
 			word_grid: dictionary containing the "identity of each word"
 		"""
 		clue = ""
-		clue_num = 1
+		clue_num = 0
 
 		team_words, opp_words, civ_words, boom_word = self.interpretGameboard(word_grid)
 
 		#Find words most relevant to each other
-		self.sim_matrix
-		team_indexs = [self.codeword_to_idx.get(x) for x in team_words]
-		opp_indexs = [self.codeword_to_idx.get(x) for x in opp_words]
-		civ_indexs = [self.codeword_to_idx.get(x) for x in civ_words]
-		boom_index = [self.codeword_to_idx.get(x) for x in boom_word]
+		team_indexs = [self.sim_matrix.get(x) for x in team_words]
+		opp_indexs = [self.sim_matrix.get(x) for x in opp_words]
+		civ_indexs = [self.sim_matrix.get(x) for x in civ_words]
+		boom_index = [self.sim_matrix.get(x) for x in boom_word]
 
 		top_team_idxs = []
 		top_opp_idxs = []
 		top_civ_idxs = []
-		top_boom_idxs = self.codeword_to_idx[boom_index].argsort()[::-1][:]
+			sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
+		top_boom_idxs = sorted[:10]
 
 		ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
 		
+		# get top 5 similarity
 		for i in ind_max:
 			if i < len(team_indexs):
 				idx = team_indexs[i]
-				top_team_idxs.append(self.codeword_to_idx[idx].argsort()[::-1][:])
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_team_idxs.append(sorted[:10])
 			if i < len(opp_indexs):
 				idx = opp_indexs[i]
-				top_opp_idxs.append(self.codeword_to_idx[idx].argsort()[::-1][:])
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_opp_idxs.append(sorted[:10])
 			if i < len(civ_indexs):
 				idx = civ_indexs[i]
-				top_civ_idxs.append(self.codeword_to_idx[idx].argsort()[::-1][:])
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_civ_idxs.append(sorted[:10])
+
+		counts = np.zeros(10,10)
+		for i in range(10):
+			for j in range(10):
+				if top_team_idxs[i][j] in top_boom_idxs:
+					continue
+				for k in range(10):
+					if top_team_idxs[i][j] in top_team_idxs[k]:
+						counts[i][j]+=1
+					if top_team_idxs[i][j] in top_opp_idxs[k]:
+						counts[i][j]-=1
+					if top_team_idxs[i][j] in top_civ_idxs[k]:
+						counts[i][j]-=0.5
+		# top indices for each word in team words
+		cts_idx = [np.argmax(z) for z in counts]
+		top_cts = [counts[i][cts_max[i]] for i in range(len(cts_max))]
+		i = np.argmax(top_cts)
+		j = cts_idx[i]
+		clue = self.idx_to_bankword()[i][j]
 
 		#Rocchio away the synonyms of the opp_words, civ_words, and boom_word
 		
