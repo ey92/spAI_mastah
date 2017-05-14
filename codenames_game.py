@@ -508,21 +508,21 @@ def endGame():
 
 	#Have the AI save their Rocchios in case they were modified during the game
 
-	if not blue_master_human:
-		print("The blue spymaster is being dismissed...")
-		blue_ai_master.saveRocchios()
+	# if not blue_master_human:
+	# 	print("The blue spymaster is being dismissed...")
+	# 	blue_ai_master.saveRocchios()
 
-	if not red_master_human:
-		print("The red spymaster is being dismissed...")
-		red_ai_master.saveRocchios()
+	# if not red_master_human:
+	# 	print("The red spymaster is being dismissed...")
+	# 	red_ai_master.saveRocchios()
 
-	if not blue_spy_human:
-		print("The blue agents are being dismissed...")
-		blue_ai_agent.saveRocchios()
+	# if not blue_spy_human:
+	# 	print("The blue agents are being dismissed...")
+	# 	blue_ai_agent.saveRocchios()
 
-	if not red_spy_human:
-		print("The red agents are being dismissed...")
-		red_ai_agent.saveRocchios()
+	# if not red_spy_human:
+	# 	print("The red agents are being dismissed...")
+	# 	red_ai_agent.saveRocchios()
 	
 
 def gameLoop():
