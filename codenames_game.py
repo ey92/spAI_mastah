@@ -147,7 +147,7 @@ def printWordGrid(game_view):
 				else:
 					word_id = word_grid.get(print_word)
 					# col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
-					print_color.append(getIdColor(word_id))
+					print_color.append(getIdColor(GUESSED))
 
 			# if guessed[position]==0:
 			# 	# col.colorprint()
