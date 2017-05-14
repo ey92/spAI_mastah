@@ -1,7 +1,7 @@
 import codenames_game as gm 
 import codenames_ai as ai
 import random
-import cPickle as pickle
+import pickle
 
 DICTIONARY_FILE = "words.txt"
 word_list = []
@@ -37,6 +37,7 @@ test_grid7 = {'Pit': 2, 'Eye': 1, 'Thumb': 1, 'Button': 0, 'Scorpion': 2, 'Sink'
 def getWords():
 	# grid_words = []
 	global word_list
+	word_list.clear()
 
 	with open(DICTIONARY_FILE,"r") as file:
 		words = file.read()
@@ -55,14 +56,17 @@ def createWordGrid():
 	global word_grid
 	global word_list
 	global assasian_word
+
+	word_grid.clear()
 	##Get random set of words in a dictionary
 	
 	#Assigned here incase of reset
-	word_grid = {} #GLOBAL
-	word_list = [] #GLOBAL, resets for every game
+	# word_grid = {} #GLOBAL
+	# word_list = [] #GLOBAL, resets for every game
 
 	#Populates word_list
-	getWords()
+	# word_list = getWords()	
+	# getWords()
 
 	##Assign key as word w/ value as BLUE_TEAM, RED_TEAM, CIVILIAN, or ASSASIAN
 	assasian_num = 1
