@@ -85,8 +85,9 @@ def printWordGrid():
 
 # Populate the word grid
 def getWords():
-	# grid_words = []
 	global word_list
+	#Assigned here incase of reset
+	word_list.clear()
 
 	with open(DICTIONARY_FILE,"r") as file:
 		words = file.read()
@@ -101,27 +102,18 @@ def getWords():
 			if word_list.count(chosen_word)==0:
 				word_list.append(chosen_word)
 
-	# return grid_words
-
-	# print(word_list)
-
-
-	# word_list = grid_words
-
 
 #Create word grid with assigning words to teams
 def createWordGrid():
-	# global word_list
 	global word_grid
 	global word_list
 	global assasian_word
-	##Get random set of words in a dictionary
-	#Assigned here incase of reset
-	word_grid = {} #GLOBAL
-	word_list = [] #GLOBAL, resets for every game
 
+	#Assigned here incase of reset
+	word_grid.clear()
+
+	##Get random set of words in a dictionary
 	#Populates word_list
-	# word_list = getWords()	
 	getWords()
 
 	##Assign key as word w/ value as BLUE_TEAM, RED_TEAM, CIVILIAN, or ASSASIAN
@@ -145,10 +137,6 @@ def createWordGrid():
 	assign_num = random.randint(0,len(assign_order)-1)
 	assign_order.insert(assign_num,ASSASIAN)
 
-	# print("Burp")
-	# print(assign_order)
-	# print(word_list)
-
 	#Assign words a label
 	for i in range(0,len(word_list)):
 		word = word_list[i]
@@ -156,11 +144,6 @@ def createWordGrid():
 		# print("Word: "+word+", ID:  "+str(assign_num))
 		word_grid.update({word:assign_num})	
 		if assign_num==ASSASIAN: assasian_word = word
-
-	# return word_list, word_grid
-
-	# print("Derp")
-	# print("Word: "+word_list+", ID:  "+word_grid.get())
 
 
 #Processes a guess made by an agent (the player) 

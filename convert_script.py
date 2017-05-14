@@ -47,10 +47,10 @@ if __name__ == "__main__":
         # MATRIX_NUM = 5
         print("This is sim_matrix5")
         # sim_matrix5 = np.empty([400,6459])
-        # file = f.read()
+        file = f.read()
         # print(file)
-        sim_matrix5 = pickle.load(f)
-        # sim_matrix5 = pickle.loads(file)
+        # sim_matrix5 = pickle.load(f)
+        sim_matrix5 = pickle.loads(file)
         # popMatrix(sim_matrix5,all_lemmas[25836+1:32295])
         pickle.dump(sim_matrix5, open('knowledge/sim_matrix5.pickle', 'wb'), protocol=2)
 
