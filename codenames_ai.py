@@ -29,9 +29,10 @@ class spyPlayer():
 		"""Returns a numpy array mapping Codename words to other possible words"""
 		sim_mat = np.empty([400,6459])
 		with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
-			file = f.read()
-			# print(file)
-			sim_mat = pickle.loads(file)
+			# file = f.read()
+			# # print(file)
+			# sim_mat = pickle.loads(file)
+			sim_mat = pickle.load(f)
 
 		# sim_mat = pickle.loads(SIM_PICKLE_HEAD+str("1")+".pickle")
 
