@@ -23,7 +23,7 @@ class spyPlayer():
 		self.idx_to_codeword = self.generateCodeWordMap()
 		self.codeword_to_idx = self.generateInvertedCodeWord()
 
-	def generateSimMatrix():
+	def generateSimMatrix(self):
 		"""Returns a numpy array mapping Codename words to other possible words"""
 		sim_mat = np.empty([400,6459])
 		with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
@@ -32,65 +32,65 @@ class spyPlayer():
 		return sim_mat
 		
 		#Should trim it such that only contains the words pertaining to the game?
-	def generateRelRocchio():
+	def generateRelRocchio(self):
 		rel_dict = {}
 		with open(RELEVANT_PICKLE,'rb') as f:
 			rel_dict = pickle.load(f)
 
 		return rel_dict
 
-	def generateIrrelRocchio():
+	def generateIrrelRocchio(self):
 		irrel_dict = {}
 		with open(IRRELEVANT_PICKLE,'rb') as f:
 			irrel_dict = pickle.load(f)
 
 		return irrel_dict
 
-	def generateBankWordMap():
+	def generateBankWordMap(self):
 		wordmap = []
 		with open(BANKWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
 		return wordmap
 
-	def generateInvertedBankWord():
+	def generateInvertedBankWord(self):
 		wordmap = {}
 		with open(INVERTED_BANKWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
 		return wordmap
 
-	def generateCodeWordMap():
+	def generateCodeWordMap(self):
 		wordmap = []
 		with open(CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
 		return wordmap
 
-	def generateInvertedCodeWord():
+	def generateInvertedCodeWord(self):
 		wordmap = {}
 		with open(INVERTED_CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
 
 		return wordmap
 
-	def getRelevantEntry(word):
+	def getRelevantEntry(self,word):
 		return self.rel_pool.get(word,[])
 
-	def getIrrelevantEntry(word):
+	def getIrrelevantEntry(self,word):
 		return self.irrel_pool.get(word,[])
 
-	def addRelevantEntry(word,rel_entry):
-		temp = getRelevantEntry(word)
+	def addRelevantEntry(self,word,rel_entry):
+		temp = self.getRelevantEntry(word)
 		temp.append(rel_entry)
 		self.rel_pool.update({word:temp})
 
-	def addIrelevantEntry(word,irrel_entry):
-		temp = getIrrelevantEntry(word)
+	def addIrelevantEntry(self,word,irrel_entry):
+		temp = self.getIrrelevantEntry(word)
 		temp.append(irrel_entry)
 		self.irrel_pool.update({word:temp})
 
-	def saveRocchios():
+	def saveRocchios(self):
 		original_rel = self.generateRelRocchio()
 		original_irrel = self.generateIrrelRocchio()
 
@@ -124,7 +124,7 @@ class spyPlayer():
 
 class spyMaster(spyPlayer):
 
-	def interpretGameboard(word_grid):
+	def interpretGameboard(self,word_grid):
 		"""Returns a 4-tuple of the words REMAINING for the spy master's team, 
 		 the opposing team, the civilians, and the assasin (represented by boom)
 		 Note: Already guessed words are noted by a negative sign"""
@@ -147,7 +147,7 @@ class spyMaster(spyPlayer):
 
 		return team_words, opp_words, civ_words, boom_word
 
-	def createClue(word_list, word_grid):
+	def createClue(self,word_list, word_grid):
 		"""Creates a clue based off the state of the gameboard [word_grid]
 			word_grid: dictionary containing the "identity of each word"
 		"""
@@ -164,11 +164,12 @@ class spyMaster(spyPlayer):
 
 
 class spyAgent(spyPlayer):
+	def __init__(self, team_num):
+		spyPlayer.__init__(self,team_num)
+		#Make a mapping of possible words to Codename words
+		self.sim_matrix = np.transpose(self.sim_matrix) #TODO Check if this is the correct way to reference
 
-	#Make a mapping of possible words to Codename words
-	self.sim_matrix = np.transpose(self.sim_matrix) #TODO Check if this is the correct way to reference
-
-	def getNonGuessed(word_list, guessed):
+	def getNonGuessed(self,word_list, guessed):
 		"""Returns a list of the words that have not been guessed yet"""
 		not_guessed = []
 		for i in range(0,len(guessed)):
@@ -177,7 +178,7 @@ class spyAgent(spyPlayer):
 		return not_guessed
 
 	# NOTE: returns a LIST of guesses, must be iterated through in order to process in main game
-	def makeGuesses(word_list, guessed,clue,num_words):
+	def makeGuesses(self,word_list, guessed,clue,num_words):
 		guesses = []
 
 		# USE INSTEAD OF WORD_LIST

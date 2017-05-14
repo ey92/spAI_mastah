@@ -294,7 +294,7 @@ def gameLoop():
 		# guess = getGuess()
 		# processGuess(guess)
 
-		print("Your clue is: "clue+" "+str(clue_num))
+		# print("Your clue is: "+clue+" "+str(clue_num))
 
 		if is_spy_master==False:
 			response = raw_input("What word would you like to guess?\n")
@@ -405,3 +405,6 @@ if __name__ == "__main__":
 		elif response == "No":
 			game_state=GAME_END
 			print("Thanks for playing! =D\n")
+
+
+# 
