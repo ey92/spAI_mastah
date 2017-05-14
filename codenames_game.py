@@ -15,6 +15,16 @@ RED_TEAM = 1
 CIVILIAN = 2
 ASSASIAN = 3
 
+#For color-printing
+MASTER_VIEW = 0
+SPY_VIEW = 1
+BLUE_CARD_COLOR = col.CBLUEBG #Blue
+RED_CARD_COLOR = col.CREDBG #Red
+CIV_CARD_COLOR = col.CGREENBG #Green
+BOOM_CARD_COLOR = col.CYELLOWBG #Yellow
+GUESSED_COLOR = col.CBLACK #Black
+TEXT_COLOR = col.CGREY
+
 #Game states
 GAME_START = 0
 GAME_RESET = 1
@@ -91,8 +101,19 @@ def createGame():
 	#Create word grid + assign words to teams
 	createWordGrid()
 
+def getIdColor(color_id):
+	if color_id==BLUE_TEAM:
+		return BLUE_CARD_COLOR
+	elif color_id==RED_TEAM:
+		return RED_CARD_COLOR
+	elif color_id==CIVILIAN:
+		return CIV_CARD_COLOR
+	elif color_id==ASSASIAN:
+		return BOOM_CARD_COLOR
+	# elif color_id==-1:
+	# 	return GUESSED_COLOR #TODO Choose a better color
 
-def printWordGrid():
+def printWordGrid(game_view):
 	# global word_list
 
 	for x in range(0,5):
@@ -101,15 +122,30 @@ def printWordGrid():
 			#If word HAS NOT been guessed yet
 			#TODO Colors
 			# print(str(position))
-			if guessed[position]==0:
-				# col.colorprint()
-				print(word_list[position]+str(guessed[position])+"\t\t", end="")
-			else:
-				print(word_list[position]+str(guessed[position])+"\t\t", end="")
+			print_word = word_list[position]
+			if game_view==SPY_VIEW:
+				if guessed[position]==0:
+					print(print_word+str(guessed[position])+"\t\t", end="")
+				else:
+					word_id = word_grid.get(print_word)
+					col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+			elif game_view==MASTER_VIEW:
+				if guessed[position]==0:
+					word_id = word_grid.get(print_word)
+					col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+				else:
+					word_id = word_grid.get(print_word)
+					col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
+			# if guessed[position]==0:
+			# 	# col.colorprint()
+			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
+			# else:
+			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
 		print("\n")
 
 	print("Blue words left: "+str(blue_words))
 	print("Red words left: "+str(red_words))
+	print("\n")
 
 
 # Populate the word grid
@@ -198,7 +234,7 @@ def processGuess(response,team_id):
 	# If not redo prompt?
 
 	#Get identity of the word
-	print(response)
+	# print(response)
 	word_identity = word_grid.get(response)
 	#Mark as guessed (make negative) for AI processing
 	word_grid.update({response:word_identity*-1})
@@ -248,6 +284,8 @@ def processGuess(response,team_id):
 		# game_state = GAME_RESET # TODO Figure out whether this should be GAME_END instead, probably not though
 		endGame()
 
+	print("\n")
+
 	return endTurn
 
 
@@ -255,8 +293,10 @@ def getHumanPrompt():
 	clue = ""
 	clue_num = 0
 	
-	clue_done = false
-	num_done = false
+	clue_done = False
+	num_done = False
+
+	printWordGrid(MASTER_VIEW)
 	
 	while not clue_done:
 		if py3:
@@ -346,7 +386,7 @@ def takeGuess(clue,clue_num):
 	while num_guesses>0:
 		valid_response=False
 		if (current_team==BLUE_TEAM and blue_spy_human) or (current_team==RED_TEAM and red_spy_human):
-			printWordGrid()
+			printWordGrid(SPY_VIEW)
 			print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
 			while not valid_response:				
 				print("Your clue is: "+clue+" "+str(num_guesses))
