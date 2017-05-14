@@ -97,7 +97,7 @@ class spyPlayer():
 		temp.append(rel_entry)
 		self.rel_pool.update({word:temp})
 
-	def addIrelevantEntry(self,word,irrel_entry):
+	def addIrrelevantEntry(self,word,irrel_entry):
 		temp = self.getIrrelevantEntry(word)
 		temp.append(irrel_entry)
 		self.irrel_pool.update({word:temp})
@@ -158,109 +158,108 @@ class spyMaster(spyPlayer):
 			elif word_id == opp_num: opp_words.append(mod_word)
 			elif word_id == civ_num: civ_words.append(mod_word)
 			elif word_id == boom_num: boom_word = mod_word
-			else: print("Why is there a "+word_id+" in the processing?!?!?")
+			else: print("Why is there a "+str(word_id)+" in the processing?!?!?")
 
 		return team_words, opp_words, civ_words, boom_word
 
 	def createClue(self,word_list, word_grid):
-        """Creates a clue based off the state of the gameboard [word_grid]
-        word_grid: dictionary containing the "identity of each word"
-        """
-        n = 200   # num similar words you care about
-        clue = ""
-        clue_num = 0
+		"""Creates a clue based off the state of the gameboard [word_grid]
+		word_grid: dictionary containing the "identity of each word"""
+		n = 200   # num similar words you care about
+		clue = ""
+		clue_num = 0
 
-        team_words, opp_words, civ_words, boom_word = self.interpretGameboard(word_grid)
+		team_words, opp_words, civ_words, boom_word = self.interpretGameboard(word_grid)
 
-        #Find words most relevant to each other
-        team_indexs = [self.codeword_to_idx.get(x) for x in team_words]
-        opp_indexs = [self.codeword_to_idx.get(x) for x in opp_words]
-        civ_indexs = [self.codeword_to_idx.get(x) for x in civ_words]
-        boom_index = [self.codeword_to_idx.get(x) for x in boom_word]
-        
+		#Find words most relevant to each other
+		team_indexs = [self.codeword_to_idx.get(x) for x in team_words]
+		opp_indexs = [self.codeword_to_idx.get(x) for x in opp_words]
+		civ_indexs = [self.codeword_to_idx.get(x) for x in civ_words]
+		boom_index = [self.codeword_to_idx.get(x) for x in boom_word]
+		
 #         print('team_indexs')
 #         print(team_indexs)
 
-        top_team_idxs = []
-        top_opp_idxs = []
-        top_civ_idxs = []
-        sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
-        top_boom_idxs = sorted[:10]
+		top_team_idxs = []
+		top_opp_idxs = []
+		top_civ_idxs = []
+		sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
+		top_boom_idxs = sorted[:10]
 
-        # ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
-    
-        # get top 5 similarity
-        for i in range(9):
-            if i < len(team_indexs):
-                idx = team_indexs[i]
-                sorted = self.sim_matrix[idx].argsort()[::-1][:]
-                top_team_idxs.append(sorted[:n])
-            if i < len(opp_indexs):
-                idx = opp_indexs[i]
-                sorted = self.sim_matrix[idx].argsort()[::-1][:]
-                top_opp_idxs.append(sorted[:n])
-            if i < len(civ_indexs):
-                idx = civ_indexs[i]
-                sorted = self.sim_matrix[idx].argsort()[::-1][:]
-                top_civ_idxs.append(sorted[:n])
+		# ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
+	
+		# get top 5 similarity
+		for i in range(9):
+			if i < len(team_indexs):
+				idx = team_indexs[i]
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_team_idxs.append(sorted[:n])
+			if i < len(opp_indexs):
+				idx = opp_indexs[i]
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_opp_idxs.append(sorted[:n])
+			if i < len(civ_indexs):
+				idx = civ_indexs[i]
+				sorted = self.sim_matrix[idx].argsort()[::-1][:]
+				top_civ_idxs.append(sorted[:n])
 
-        counts = np.zeros([n,n])
+		counts = np.zeros([n,n])
 #         team_similar = []
-        
+		
 #         for i in range(8):
 #             print(top_team_idxs[i])
 #             team_similar.append([self.idx_to_bankword[x] for x in top_team_idxs[i]])
 #             print(team_similar[i])
-        
-        print("team")
-        print(team_words)
-        print("opp")
-        print(opp_words)
-        print("civ")
-        print(civ_words)
-        print("boom")
-        print(boom_word)
+		
+		# print("team")
+		# print(team_words)
+		# print("opp")
+		# print(opp_words)
+		# print("civ")
+		# print(civ_words)
+		# print("boom")
+		# print(boom_word)
 
-        for i in range(len(top_team_idxs)):
-            if i < len(top_team_idxs):
-                for j in range(n):
-                    if j < len(top_team_idxs[0]):
-                        try:
-                            top_team_idxs[i][j]
-                        
-                            for k in range(len(top_team_idxs)):
-                                if k < len(top_team_idxs):
-                                    if top_team_idxs[i][j] in top_team_idxs[k]:
-                                        counts[i][j]+=1
-                                if k < len(top_opp_idxs):
-                                    if top_team_idxs[i][j] in top_opp_idxs[k]:
-                                        counts[i][j]-=0.8
-                                if k < len(top_civ_idxs):
-                                    if top_team_idxs[i][j] in top_civ_idxs[k]:
-                                         counts[i][j]-=0.3
-                        except:
-                            print(i,j,k)
-                            print(top_team_idxs[i])
+		for i in range(len(top_team_idxs)):
+			if i < len(top_team_idxs):
+				for j in range(n):
+					if j < len(top_team_idxs[0]):
+						try:
+							top_team_idxs[i][j]
+						
+							for k in range(len(top_team_idxs)):
+								if k < len(top_team_idxs):
+									if top_team_idxs[i][j] in top_team_idxs[k]:
+										counts[i][j]+=1
+								if k < len(top_opp_idxs):
+									if top_team_idxs[i][j] in top_opp_idxs[k]:
+										counts[i][j]-=0.8
+								if k < len(top_civ_idxs):
+									if top_team_idxs[i][j] in top_civ_idxs[k]:
+										 counts[i][j]-=0.3
+						except:
+							print(i,j,k)
+							# print(top_team_idxs[i])
 #                             print(top_team_idxs[k])
-        # top indices for each word in team words
-        cts_idx = [np.argmax(z) for z in counts]
-        top_cts = [counts[i][cts_idx[i]] for i in range(len(cts_idx))]
-        i = np.argmax(top_cts)
-        j = cts_idx[i]
+		# top indices for each word in team words
+		cts_idx = [np.argmax(z) for z in counts]
+		top_cts = [counts[i][cts_idx[i]] for i in range(len(cts_idx))]
+		i = np.argmax(top_cts)
+		j = cts_idx[i]
 
-        ii = [team_indexs[i]][0]
-        jj = [top_team_idxs[i][j]][0]
+		ii = [team_indexs[i]][0]
+		jj = [top_team_idxs[i][j]][0]
 
 #         print(counts[i][j])
-        clue = self.idx_to_bankword[jj]
-        clue_num = np.floor(counts[i][j])
-        
+		clue = self.idx_to_bankword[jj]
+		clue_num = np.floor(counts[i][j])
+		
 #         for i in range(n):
 #             print(counts[i])
 
-        #Rocchio away the synonyms of the opp_words, civ_words, and boom_word
+		#Rocchio away the synonyms of the opp_words, civ_words, and boom_word
 
-        return clue, clue_num
+		return clue, clue_num
 
 
 class spyAgent(spyPlayer):
@@ -297,10 +296,11 @@ class spyAgent(spyPlayer):
 		#For each relevant word
 		for rel_word in rel_words:
 			#Get sim vector of rel_word
+			print(rel_word)
 			rel_idx = self.bankword_to_idx.get(rel_word)
+			print(str(rel_idx))
 			rel_vector = self.sim_matrix[rel_idx]
-			beta_term+=rel_vector
-		
+			beta_term+=rel_vector		
 		#Account for divide by zero
 		b_frac = 0
 		if len(rel_words)>0: b_frac = BETA_ROCC/len(rel_words)
@@ -336,6 +336,9 @@ class spyAgent(spyPlayer):
 		# Get sim vector for the clue
 		clue_idx = self.bankword_to_idx.get(clue)
 		clue_vec = self.sim_matrix[clue_idx]
+
+		print("Clue for guessing is: "+clue)
+		# print(np.shape(ranking))
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue
 		query = clue.lower()		
