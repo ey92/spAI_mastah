@@ -159,7 +159,7 @@ class spyMaster(spyPlayer):
 			elif word_id == opp_num: opp_words.append(mod_word)
 			elif word_id == civ_num: civ_words.append(mod_word)
 			elif word_id == boom_num: boom_word = mod_word
-			else: print("Why is there a "+str(word_id)+" in the processing?!?!?")
+			# else: print("Why is there a "+str(word_id)+" in the processing?!?!?")
 
 		return team_words, opp_words, civ_words, boom_word
 
@@ -338,7 +338,7 @@ class spyAgent(spyPlayer):
 		clue_idx = self.bankword_to_idx.get(clue)
 		clue_vec = self.sim_matrix[clue_idx]
 
-		print("Clue for guessing is: "+clue)
+		# print("Clue for guessing is: "+clue)
 		# print(np.shape(ranking))
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue

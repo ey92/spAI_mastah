@@ -17,12 +17,15 @@ ASSASIAN = 3
 #For color-printing
 MASTER_VIEW = 0
 SPY_VIEW = 1
+GUESSED = 4
+NOT_GUESSED = 5
 BLUE_CARD_COLOR = col.CBLUEBG2 #Blue
 RED_CARD_COLOR = col.CREDBG #Red
 CIV_CARD_COLOR = col.CGREENBG #Green
 BOOM_CARD_COLOR = col.CBEIGEBG #Yellow
 # GUESSED_COLOR = col.CBLACK #Black
 GUESSED_COLOR = col.CVIOLETBG
+NOT_GUESSED_COLOR = col.CBLACKBG
 TEXT_COLOR = col.CGREY
 
 #Game states
@@ -55,10 +58,6 @@ word_list = []
 guessed = [0]*total_words
 assasian_word = ""
 
-#TODO Distinguish agent vs. spy master input/output and actions and logic processsing and everything
-#TODO Finish game loop
-#TODO COLORS
-
 
 def createGame():
 	global current_team
@@ -88,16 +87,16 @@ def createGame():
 
 	#Create AIs if necessary, complete with loading messages
 	if not blue_master_human: 
-		print("Recruiting a spy master for blue team...")
+		print("Recruiting a spy master for the blue team...")
 		blue_ai_master = ai.spyMaster(BLUE_TEAM)
 	if not blue_spy_human: 
-		print("Recruiting spy agents for blue team...")
+		print("Recruiting spy agents for the blue team...")
 		blue_ai_agent = ai.spyAgent(BLUE_TEAM)
 	if not red_master_human: 
-		print("Recruiting a spy master for red team...")
+		print("Recruiting a spy master for the red team...")
 		red_ai_master = ai.spyMaster(RED_TEAM)
 	if not red_spy_human: 
-		print("Recruiting spy agents for red team...")
+		print("Recruiting spy agents for the red team...")
 		red_ai_agent = ai.spyAgent(RED_TEAM)
 	
 	print("\n")
@@ -105,18 +104,18 @@ def createGame():
 	createWordGrid()
 
 def getIdColor(color_id):
-	if color_id==BLUE_TEAM:
+	if abs(color_id)==BLUE_TEAM:
 		return BLUE_CARD_COLOR
-	elif color_id==RED_TEAM:
+	elif abs(color_id)==RED_TEAM:
 		return RED_CARD_COLOR
-	elif color_id==CIVILIAN:
+	elif abs(color_id)==CIVILIAN:
 		return CIV_CARD_COLOR
-	elif color_id==ASSASIAN:
+	elif abs(color_id)==ASSASIAN:
 		return BOOM_CARD_COLOR
-	elif color_id==-1:
+	elif abs(color_id)==GUESSED:
 		return GUESSED_COLOR
-	# elif color_id==-1:
-	# 	return GUESSED_COLOR #TODO Choose a better color
+	elif abs(color_id)==NOT_GUESSED:
+		return NOT_GUESSED_COLOR #TODO Choose a better color
 
 def printWordGrid(game_view):
 	# global word_list
@@ -135,7 +134,7 @@ def printWordGrid(game_view):
 			if game_view==SPY_VIEW:
 				if guessed[position]==0:
 					# print(print_word+str(guessed[position])+"\t\t", end="")
-					print_color.append(None)
+					print_color.append(getIdColor(NOT_GUESSED))
 				else:
 					word_id = word_grid.get(print_word)
 					# col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
@@ -387,6 +386,7 @@ def getPrompt():
         # print("It is Blue Spy Master's Turn")
 
         if not blue_master_human:
+        	print("The blue spy master is thinking...\n")
             return blue_ai_master.createClue(word_list,word_grid)
         else:
             return getHumanPrompt()
@@ -396,6 +396,7 @@ def getPrompt():
         # red spy master stuff
         # print("It is Red Spy Master's Turn")
         if not red_master_human:
+        	print("The red spy master is thinking...\n")
             return red_ai_master.createClue(word_list,word_grid)
         else:
             return getHumanPrompt()
@@ -408,11 +409,13 @@ def takeGuess(clue,clue_num):
 	guess = "dummy guess"
 	num_guesses = clue_num
 
-	while num_guesses>0:
-		valid_response=False
+	print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
+
+	while num_guesses>0:		
 		if (current_team==BLUE_TEAM and blue_spy_human) or (current_team==RED_TEAM and red_spy_human):
 			printWordGrid(SPY_VIEW)
-			print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
+			# print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
+			valid_response=False
 			while not valid_response:				
 				print("Your clue is: "+clue+" "+str(num_guesses))
 				response = ""
@@ -433,10 +436,14 @@ def takeGuess(clue,clue_num):
 					valid_response=True
 					num_guesses-=1
 		elif current_team==BLUE_TEAM and not blue_spy_human:
+			print("The clue is: "+clue+" "+str(num_guesses)+"\n")
+			print("The blue agents are thinking...\n")
 			query = clue.capitalize()
 			guess = blue_ai_agent.makeGuesses(word_list, guessed,query,clue_num)
 			num_guesses-=1
 		elif current_team==RED_TEAM and not red_spy_human:
+			print("The clue is: "+clue+" "+str(num_guesses)+"\n")
+			print("The red agents are thinking...\n")
 			query = clue.capitalize()
 			guess = red_ai_agent.makeGuesses(word_list, guessed,query,clue_num)
 			num_guesses-=1
@@ -450,10 +457,10 @@ def takeGuess(clue,clue_num):
 		if result: 
 			num_guesses=0
 		
-		#Teach AI
+		#Teach AI only if playing with humans, don't have learn off of selves
 
 		#Have agents account for their guess being related (or not) to the clue based on correctness
-		if current_team==BLUE_TEAM and not blue_spy_human:
+		if current_team==BLUE_TEAM and not blue_spy_human and blue_master_human:
 			query = clue.lower()
 			#If the guess was wrong, the two are probably not related
 			if result:
@@ -466,7 +473,7 @@ def takeGuess(clue,clue_num):
 				blue_ai_agent.addRelevantEntry(query,guess)
 				blue_ai_agent.addRelevantEntry(guess,query)
 
-		if current_team==RED_TEAM and not red_spy_human:
+		if current_team==RED_TEAM and not red_spy_human and red_master_human:
 			query = clue.lower()
 			#If the guess was wrong, the two are probably not related
 			if result:
@@ -480,31 +487,25 @@ def takeGuess(clue,clue_num):
 				red_ai_agent.addRelevantEntry(guess,query)
 
 		#TODO Teach AI master based off what it was trying to get people to guess and the clue it gave
-		if current_team==BLUE_TEAM and not blue_master_human:
-			pass
-			# query = clue.lower() 
-			# Also get words that AI intended to be guessed, replaces guess in statement
-			# #If the guess was wrong, the two are probably not related
-			# if result:
-			# 	blue_ai_agent.addIrrelevantEntry(query,guess)
-			# 	blue_ai_agent.addIrrelevantEntry(guess,query)
-			# #If the guess was correct, the two are probably related
-			# else:
-			# 	blue_ai_agent.addRelevantEntry(query,guess)
-			# 	blue_ai_agent.addRelevantEntry(guess,query)
+		if current_team==BLUE_TEAM and not blue_master_human and blue_spy_human:
+			query = clue.lower() 
+			#Also get words that AI intended to be guessed, replaces guess in statement
+			#If the guess was wrong, the two are probably thought to be related
+			
+			blue_ai_master.addRelevantEntry(query,guess)
+			blue_ai_master.addRelevantEntry(guess,query)
 
-		if current_team==RED_TEAM and not red_master_human:
-			pass
-			# query = clue.lower()
-			# Also get words that AI intended to be guessed, replaces guess in statement
-			# #If the guess was wrong, the two are probably not related
-			# if result:
-			# 	red_ai_agent.addIrrelevantEntry(query,guess)
-			# 	red_ai_agent.addIrrelevantEntry(guess,query)
-			# #If the guess was correct, the two are probably related
-			# else:
-			# 	red_ai_agent.addRelevantEntry(query,guess)
-			# 	red_ai_agent.addRelevantEntry(guess,query)
+			#TODO Add clue and top num_clue words from processing to irrelevant
+
+		if current_team==RED_TEAM and not red_master_human and red_spy_human:
+			query = clue.lower()
+			#Also get words that AI intended to be guessed, replaces guess in statement
+			#If the guess was wrong, the two are probably thought to be related
+			
+			red_ai_master.addRelevantEntry(query,guess)
+			red_ai_master.addRelevantEntry(guess,query)
+
+			#TODO Add clue and top num_clue words from processing to irrelevant
 
 
 #Returns a team number as a team string because lazy
@@ -534,21 +535,21 @@ def endGame():
 	#Have the AI save their Rocchios in case they were modified during the game
 
 	# LEAVE THESE COMMENTS HERE
-	# if not blue_master_human:
-	# 	print("The blue spymaster is being dismissed...")
-	# 	blue_ai_master.saveRocchios()
+	if not blue_master_human:
+		print("The blue spymaster is being dismissed...")
+		blue_ai_master.saveRocchios()
 
-	# if not red_master_human:
-	# 	print("The red spymaster is being dismissed...")
-	# 	red_ai_master.saveRocchios()
+	if not red_master_human:
+		print("The red spymaster is being dismissed...")
+		red_ai_master.saveRocchios()
 
-	# if not blue_spy_human:
-	# 	print("The blue agents are being dismissed...")
-	# 	blue_ai_agent.saveRocchios()
+	if not blue_spy_human:
+		print("The blue agents are being dismissed...")
+		blue_ai_agent.saveRocchios()
 
-	# if not red_spy_human:
-	# 	print("The red agents are being dismissed...")
-	# 	red_ai_agent.saveRocchios()
+	if not red_spy_human:
+		print("The red agents are being dismissed...")
+		red_ai_agent.saveRocchios()
 	
 
 def gameLoop():
