@@ -3,19 +3,24 @@ import numpy as np
 import rocchio as ro
 import pickle
 
-# CODENAMES_WORDLIST = "words_to_process.txt"
+#List of words in the English language
 BANKWORDS_PICKLE = "knowledge/idx_to_lemma.pickle"
+#Inverted index to access words in the English language
 INVERTED_BANKWORDS_PICKLE = "knowledge/lemma_to_idx.pickle"
+#List of words possible in Codenames
 CODEWORDS_PICKLE = "knowledge/idx_to_codeword.pickle"
+#Inverted index to access words possible in Codenames
 INVERTED_CODEWORDS_PICKLE = "knowledge/codeword_to_idx.pickle"
-
+#Similarity matrix mapping "Codename" words to "English" words
 SIM_PICKLE_HEAD = "knowledge/sim_matrix"
+#Dictionary mapping words to lists their related/unrelated words, used for Rocchio algorithm
 RELEVANT_PICKLE = "knowledge/relevant_rocchio.pickle"
 IRRELEVANT_PICKLE = "knowledge/irrelevant_rocchio.pickle"
 
-ALPHA_ROCC = 0.3
-BETA_ROCC = 0.3
-GAMMA_ROCC = 0.8
+#Constant weights for Rocchio
+ALPHA_ROCC = 0.5
+BETA_ROCC = 0.8
+GAMMA_ROCC = 0.6
 
 class spyPlayer():
 	def __init__(self, team_num):
@@ -32,9 +37,6 @@ class spyPlayer():
 		"""Returns a numpy array mapping Codename words to other possible words"""
 		sim_mat = np.empty([400,6459])
 		with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
-			# file = f.read()
-			# # print(file)
-			# sim_mat = pickle.loads(file)
 			sim_mat = pickle.load(f)
 
 		return sim_mat
@@ -43,27 +45,21 @@ class spyPlayer():
 	def generateRelRocchio(self):
 		rel_dict = {}
 		with open(RELEVANT_PICKLE,'rb') as f:
-			rel_dict = pickle.load(f)
-
-		# rel_dict = pickle.loads(RELEVANT_PICKLE)
+			rel_dict = pickle.load(f)	
 
 		return rel_dict
 
 	def generateIrrelRocchio(self):
 		irrel_dict = {}
 		with open(IRRELEVANT_PICKLE,'rb') as f:
-			irrel_dict = pickle.load(f)
-
-		# irrel_dict = pickle.loads(IRRELEVANT_PICKLE)
+			irrel_dict = pickle.load(f)	
 
 		return irrel_dict
 
 	def generateBankWordMap(self):
 		wordmap = []
 		with open(BANKWORDS_PICKLE,'rb') as f:
-			wordmap = pickle.load(f)
-
-		# wordmap = pickle.loads(BANKWORDS_PICKLE)
+			wordmap = pickle.load(f)	
 
 		return wordmap
 
@@ -71,27 +67,21 @@ class spyPlayer():
 		wordmap = {}
 		with open(INVERTED_BANKWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
-
-		# wordmap = pickle.loads(INVERTED_BANKWORDS_PICKLE)
-
+	
 		return wordmap
 
 	def generateCodeWordMap(self):
 		wordmap = []
 		with open(CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
-
-		# wordmap = pickle.loads(CODEWORDS_PICKLE)
-
+	
 		return wordmap
 
 	def generateInvertedCodeWord(self):
 		wordmap = {}
 		with open(INVERTED_CODEWORDS_PICKLE,'rb') as f:
 			wordmap = pickle.load(f)
-
-		# wordmap = pickle.loads(INVERTED_CODEWORDS_PICKLE)
-
+	
 		return wordmap
 
 	def getRelevantEntry(self,word):
@@ -125,7 +115,7 @@ class spyPlayer():
 			original_rel.update({entry:original_list})
 
 		with open(RELEVANT_PICKLE,'wb') as f:
-			pickle.dump(original_rel,f)
+			pickle.dump(original_rel,f, protocol=2)
 
 
 		#Update original irrelevant rocchio with only NEW entries made during the game 
@@ -139,7 +129,7 @@ class spyPlayer():
 			original_irrel.update({entry:original_list})
 
 		with open(IRRELEVANT_PICKLE,'wb') as f:
-			pickle.dump(original_irrel,f)
+			pickle.dump(original_irrel,f, protocol=2)
 
 
 class spyMaster(spyPlayer):	
@@ -210,7 +200,7 @@ class spyAgent(spyPlayer):
 	def __init__(self, team_num):
 		spyPlayer.__init__(self,team_num)
 		#Make a mapping of possible words to Codename words
-		self.sim_matrix = np.transpose(self.sim_matrix) #TODO Check if this is the correct way to reference
+		self.sim_matrix = np.transpose(self.sim_matrix) 
 
 	def getNonGuessed(self,word_list, guessed):
 		"""Returns a list of the words that have not been guessed yet"""
@@ -224,18 +214,18 @@ class spyAgent(spyPlayer):
 	def computeRocchio(self,word):
 		rel_words = self.rel_pool.get(word,[])
 		irrel_words = self.irrel_pool.get(word,[])
-		# mod_vec = np.empty([17000]) #TODO Replace
-		# alpha_term = np.empty([17000]) #TODO Replace
-		# beta_term = np.empty([17000]) #TODO Replace
-		# gamma_term = np.empty([17000]) #TODO Replace
 		
 		#Get sim vector for word, mult. by alpha term
-		# sim_vector = np.empty([17000]) #TODO Replace
 		sim_idx = self.bankword_to_idx.get(word)
 		sim_vector = self.sim_matrix[sim_idx]
-		# sim_vector = word_vec #Sanity comprehension, 
+		sim_size = np.shape(sim_vector)
+		
+		#Define accumulators
+		alpha_term = np.empty([sim_size[0],])
+		beta_term = np.empty([sim_size[0],])
+		gamma_term = np.empty([sim_size[0],])
+		
 		alpha_term = ALPHA_ROCC*sim_vector
-		# alpha_term = ALPHA_ROCC*word_vec
 
 		#For each relevant word
 		for rel_word in rel_words:
@@ -243,7 +233,10 @@ class spyAgent(spyPlayer):
 			rel_idx = self.bankword_to_idx.get(rel_word)
 			rel_vector = self.sim_matrix[rel_idx]
 			beta_term+=rel_vector
-		b_frac = BETA_ROCC/len(rel_words)
+		
+		#Account for divide by zero
+		b_frac = 0
+		if len(rel_words)>0: b_frac = BETA_ROCC/len(rel_words)
 		beta_term = b_frac*beta_term
 
 		#For each irrelevant word
@@ -252,7 +245,9 @@ class spyAgent(spyPlayer):
 			irrel_idx = self.bankword_to_idx.get(irrel_word)
 			irrel_vector = self.sim_matrix[irrel_idx]
 			gamma_term+=irrel_vector
-		c_frac = GAMMA_ROCC/len(irrel_words)
+		#Account for divide by zero
+		c_frac = 0
+		if len(irrel_words)>0: c_frac = GAMMA_ROCC/len(irrel_words)
 		gamma_term = c_frac*gamma_term
 
 		#Calculate updated query
@@ -271,39 +266,27 @@ class spyAgent(spyPlayer):
 		# USE INSTEAD OF WORD_LIST
 		word_choices = self.getNonGuessed(word_list, guessed)
 
-		# print(self.sim_matrix)
-
 		# Get sim vector for the clue
 		clue_idx = self.bankword_to_idx.get(clue)
-		# print(clue_idx)
 		clue_vec = self.sim_matrix[clue_idx]
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue
-		# mod_clue_vec = self.computeRocchio(clue_vec) #clue_vec # TODO Rocchio
-		mod_clue_vec = self.computeRocchio(clue) #clue_vec # TODO Rocchio
-
-		# print("Mod vector")
-		# print(mod_clue_vec)
+		mod_clue_vec = self.computeRocchio(clue)
 
 		# Get argsort of resulting vector as ranking
 		ranking = np.argsort(mod_clue_vec)
-		#Change from ascending to descending order
+		# Change from ascending to descending order
 		ranking = np.flip(ranking,0)
-		# print("Ranking")
-		# print(ranking)
 
+		#Get most similar words in word_grid
 		counter = 0
+		#Only get the number of words guessed
 		while len(guesses)<num_words:
 			code_check = ranking[counter]
-			# print(code_check)
 			codeword = self.idx_to_codeword[code_check] 
+			#Only append the most similar word if it's on the board
 			if word_choices.count(codeword) ==1: guesses.append(codeword)
 			counter+=1
-
-		# While len(guesses) < num_words
-			#Iterate through ranking via counter
-			#if idx_to_codeword[counter] is in word_list
-				#Append result to guesses
 
 		return guesses
 

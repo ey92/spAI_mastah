@@ -101,16 +101,13 @@ if __name__ == "__main__":
 	print("Test list 1")
 	print(test.makeGuesses(test_list,word_guessed,"apparel",25))
 	print("\n")
-	print("\n")
 
 	print("Test list 2")
 	print(test.makeGuesses(test_list2,word_guessed,"animal",25))
 	print("\n")
-	print("\n")
 
 	print("Test list 3")
 	print(test.makeGuesses(test_list3,word_guessed,"animal",25))
-	print("\n")
 	print("\n")
 
 	# print("Test list 1")
