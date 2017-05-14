@@ -297,7 +297,7 @@ def gameLoop():
 		# print("Your clue is: "+clue+" "+str(clue_num))
 
 		if is_spy_master==False:
-			response = raw_input("What word would you like to guess?\n")
+			response = input("What word would you like to guess?\n")
 			response = response.strip()
 			response = response.capitalize()
 			# Prevent users from making typos or guessing words not on the board
@@ -307,7 +307,7 @@ def gameLoop():
 				# response = response.lower()
 				processGuess(response)
 		else:
-			response = raw_input("What prompt would you like to give?\n")
+			response = input("What prompt would you like to give?\n")
 			#Format prompt for rule-checking
 			response = response.strip()
 			temp = response
@@ -324,7 +324,7 @@ def gameLoop():
 			elif not temp.isalpha():
 				print("Hey now, you can't put non-alphabet characters in your clue! Try a different one.")
 			else: 
-				number = raw_input("How many words are there?\n")
+				number = input("How many words are there?\n")
 				if not number.isdigit():
 					print("Hey, this isn't a number! Now you have to start over because user edge-cases are annoying to handle =(")
 				else: 
@@ -339,7 +339,7 @@ def gameLoop():
 def main():
 	global game_state
 	# print("Welcome to Codenames!\n")
-	response = raw_input("Would you like to be spy master? [Yes/No]\n")
+	response = input("Would you like to be spy master? [Yes/No]\n")
 	response = response.capitalize()
 	# TODO ask if there are human players for both teams
 	# TODO ask which team the player wants to be on if only one team has human players
@@ -354,7 +354,7 @@ def main():
 		is_spy_master = False
 		print("Your response could not be read, you have been defaulted to not being spy master\n")
 
-	team_req = raw_input("Which team do you want to be on? [Blue/Red]\n")
+	team_req = input("Which team do you want to be on? [Blue/Red]\n")
 	team_req = team_req.capitalize()
 	
 	# TODO ask if there are human players for both teams
@@ -396,7 +396,7 @@ if __name__ == "__main__":
 	while not game_state==GAME_END:
 		main()
 
-		response = raw_input("Would you like to play again?[Yes/No]")
+		response = input("Would you like to play again?[Yes/No]")
 		response = response.strip()
 		response = response.capitalize()
 		if response == "Yes":

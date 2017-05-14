@@ -1,5 +1,5 @@
 import numpy as np
-import cPickle as pickle
+import pickle as pickle
 
 RELEVANT_PICKLE = "relevant.pickle"
 IRRELEVANT_PICKLE = "irrelevant.pickle"
