@@ -22,6 +22,15 @@ test_list=['pitch', 'canada', 'fork', 'model', 'cloak', 'pass', 'washer', 'sock'
 test_list2=['block', 'limousine', 'buck', 'berlin', 'life', 'compound', 'degree', 'cover', 'sound', 'cliff', 'australia', 'horseshoe', 'lock', 'arm', 'centaur', 'tower', 'green', 'mole', 'germany', 'scorpion', 'pool', 'ruler', 'film', 'duck', 'hospital']
 test_list3=['face', 'smuggler', 'switch', 'field', 'tube', 'egypt', 'plot', 'cricket', 'tooth', 'alps', 'soul', 'bank', 'spy', 'fly', 'kid', 'pistol', 'eagle', 'glove', 'snowman', 'compound', 'bolt', 'diamond', 'king', 'cloak', 'ruler']
 
+test_list4 = ['light', 'net', 'glove', 'moon', 'cell', 'spy', 'swing', 'spike', 'ship', 'greece', 'boom', 'maple', 'snowman', 'vet', 'america', 'iron', 'jack', 'dog', 'olive', 'battery', 'centaur', 'cricket', 'green', 'tablet', 'pupil']
+test_grid4 = {'vet': 2, 'tablet': 2, 'light': 2, 'swing': 0, 'dog': 0, 'glove': 2, 'moon': 2, 'cell': 0, 'green': 1, 'boom': 3, 'iron': 1, 'spike': 1, 'net': 1, 'snowman': 1, 'spy': 1, 'cricket': 0, 'battery': 2, 'centaur': 1, 'jack': 0, 'greece': 1, 'olive': 2, 'ship': 0, 'america': 0, 'maple': 0, 'pupil': 0}
+
+test_list5 = ['glove', 'back', 'bomb', 'yard', 'rock', 'screen', 'hawk', 'box', 'watch', 'missile', 'china', 'telescope', 'spine', 'ball', 'switch', 'antactica', 'soldier', 'stream', 'lemon', 'cook', 'spot', 'moon', 'engine', 'war', 'sink']
+test_grid5 = {'box': 1, 'yard': 2, 'spine': 2, 'watch': 3, 'antactica': 2, 'glove': 2, 'moon': 2, 'soldier': 0, 'switch': 0, 'rock': 1, 'lemon': 0, 'war': 0, 'engine': 1, 'ball': 1, 'bomb': 1, 'telescope': 1, 'stream': 2, 'screen': 0, 'spot': 1, 'back': 2, 'missile': 1, 'china': 0, 'sink': 0, 'cook': 0, 'hawk': 0}
+
+test_list6 = ['india', 'field', 'ground', 'life', 'mexico', 'deck', 'stick', 'canada', 'pan', 'bat', 'lap', 'bark', 'washington', 'cliff', 'organ', 'atlantis', 'heart', 'dwarf', 'angel', 'buck', 'space', 'grace', 'nail', 'germany', 'temple']
+test_grid6 = {'canada': 0, 'buck': 2, 'bat': 1, 'organ': 2, 'space': 0, 'india': 1, 'field': 0, 'temple': 0, 'pan': 2, 'heart': 0, 'life': 0, 'atlantis': 0, 'dwarf': 1, 'angel': 1, 'mexico': 1, 'deck': 1, 'washington': 3, 'nail': 2, 'germany': 0, 'stick': 2, 'bark': 2, 'ground': 0, 'lap': 2, 'grace': 1, 'cliff': 1}
+
 def getWords():
 	# grid_words = []
 	global word_list
