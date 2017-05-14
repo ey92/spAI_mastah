@@ -18,10 +18,11 @@ ASSASIAN = 3
 MASTER_VIEW = 0
 SPY_VIEW = 1
 BLUE_CARD_COLOR = col.CBLUEBG2 #Blue
-RED_CARD_COLOR = col.CREDBG2 #Red
-CIV_CARD_COLOR = col.CGREENBG2 #Green
-BOOM_CARD_COLOR = col.CYELLOWBG2 #Yellow
-GUESSED_COLOR = col.CBLACK #Black
+RED_CARD_COLOR = col.CREDBG #Red
+CIV_CARD_COLOR = col.CGREENBG #Green
+BOOM_CARD_COLOR = col.CBEIGEBG #Yellow
+# GUESSED_COLOR = col.CBLACK #Black
+GUESSED_COLOR = col.CVIOLETBG
 TEXT_COLOR = col.CGREY
 
 #Game states
@@ -83,6 +84,8 @@ def createGame():
 		blue_words = 8
 		red_words = 9
 
+	print("\n")
+
 	#Create AIs if necessary, complete with loading messages
 	if not blue_master_human: 
 		print("Recruiting a spy master for blue team...")
@@ -97,6 +100,7 @@ def createGame():
 		print("Recruiting spy agents for red team...")
 		red_ai_agent = ai.spyAgent(RED_TEAM)
 	
+	print("\n")
 	#Create word grid + assign words to teams
 	createWordGrid()
 
@@ -109,6 +113,8 @@ def getIdColor(color_id):
 		return CIV_CARD_COLOR
 	elif color_id==ASSASIAN:
 		return BOOM_CARD_COLOR
+	elif color_id==-1:
+		return GUESSED_COLOR
 	# elif color_id==-1:
 	# 	return GUESSED_COLOR #TODO Choose a better color
 
@@ -116,25 +122,33 @@ def printWordGrid(game_view):
 	# global word_list
 
 	for x in range(0,5):
+		# colorprint(text,color,bg=None,bold=False)
+		print_text = []
+		print_color = []
 		for y in range(0,5):
 			position = y+(x*5)
 			#If word HAS NOT been guessed yet
 			#TODO Colors
 			# print(str(position))
 			print_word = word_list[position]
+			print_text.append(print_word)
 			if game_view==SPY_VIEW:
 				if guessed[position]==0:
-					print(print_word+str(guessed[position])+"\t\t", end="")
+					# print(print_word+str(guessed[position])+"\t\t", end="")
+					print_color.append(None)
 				else:
 					word_id = word_grid.get(print_word)
-					col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+					# col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+					print_color.append(getIdColor(word_id))
 			elif game_view==MASTER_VIEW:
 				if guessed[position]==0:
 					word_id = word_grid.get(print_word)
-					col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+					# col.colorprint(print_word+"\t\t",TEXT_COLOR,getIdColor(word_id))
+					print_color.append(getIdColor(word_id))
 				else:
 					word_id = word_grid.get(print_word)
-					col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
+					# col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
+					print_color.append(getIdColor(word_id))
 
 			# if guessed[position]==0:
 			# 	# col.colorprint()
@@ -143,8 +157,10 @@ def printWordGrid(game_view):
 			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
 
 		# print("\n")
+		col.colorprint(print_text,print_color)
 	col.endColor()
 
+	print("KEY: Blue team = blue, Red team = red, Civilian = green, Assasian = yellow/beige/teal")
 	print("Blue words left: "+str(blue_words))
 	print("Red words left: "+str(red_words))
 	print("\n")
@@ -309,6 +325,7 @@ def getHumanPrompt():
 		temp = clue
 		# temp = temp.capitalize()
 		dict_check = True
+		# **Only care if not a real word if the agents aren't human**
 		if current_team==BLUE_TEAM and not blue_spy_human: 
 			temp = temp.lower()
 			exists = blue_ai_agent.bankword_to_idx.get(temp)
@@ -318,18 +335,20 @@ def getHumanPrompt():
 			exists = red_ai_agent.bankword_to_idx.get(temp)
 			if exists==None: dict_check= False
 					
-		clue.capitalize()
+		clue = clue.capitalize()
 
 		if word_list.count(clue)==1 and guessed[word_list.index(clue)]==0:
-			print("Hey, \""+response+"\"  is on the board already! You can't use that as a clue! Try a different one.")
+			print("Hey, \""+clue+"\"  is on the board already! You can't use that as a clue! Try a different one.")
 		elif clue.count(" ") > 0:
 			print("You can only provide one word as a clue! Try a different one.")
 		elif not clue.isalpha():
 			print("Hey now, you can't put non-alphabet characters in your clue! Try a different one.")
 		elif not dict_check:
-			print("\""+temp+"\" doesn't exist in the agents' vocabulary! Can you try a different one instead?")
+			print("\""+clue+"\" doesn't exist in the agents' vocabulary! Can you try a different one instead?")
 		else:
-			clue_done = true
+			clue_done = True
+
+		print("\n")
 			
 	while not num_done:
 		if py3:
@@ -341,8 +360,10 @@ def getHumanPrompt():
 		if not clue_num.isdigit():
 			print("Hey, this isn't a number! Try again!")
 		else:
-			num_done = true
+			num_done = True
 			clue_num = int(clue_num)
+
+		print("\n")
 			
 	return clue, clue_num
 
@@ -353,25 +374,27 @@ def getPrompt():
     #If human is the spy master and if it's their tur
     global blue_ai_master
     global red_ai_master
+
+    print("[Current turn: "+getTeamString(current_team)+", SPY MASTER]\n")
     
     clue = ""
     clue_num = 0
     
     if current_team == BLUE_TEAM:
-        print("[Current Team: Blue Team]")
+        # print("[Current Team: Blue Team]")
 
         # blue spy master stuff
-        print("It is Blue Spy Master's Turn")
+        # print("It is Blue Spy Master's Turn")
 
         if not blue_master_human:
             return blue_ai_master.createClue(word_list,word_grid)
         else:
             return getHumanPrompt()
     else:
-        print("[Current Team: Blue Team]")
+        # print("[Current Team: Blue Team]")
         
         # red spy master stuff
-        print("It is Red Spy Master's Turn")
+        # print("It is Red Spy Master's Turn")
         if not red_master_human:
             return red_ai_master.createClue(word_list,word_grid)
         else:
@@ -380,7 +403,7 @@ def getPrompt():
     return clue, clue_num
 
 #Returns a guess made by the players (human or AI) based off the clue
-def getGuess(clue,clue_num):
+def takeGuess(clue,clue_num):
 	#Guesses must be processed after each on is made
 	guess = "dummy guess"
 	num_guesses = clue_num
@@ -484,72 +507,6 @@ def getGuess(clue,clue_num):
 			# 	red_ai_agent.addRelevantEntry(guess,query)
 
 
-	# if is_spy_master==False:
-	# 		response = input("What word would you like to guess?\n")
-	# 		response = response.strip()
-	# 		response = response.capitalize()
-	# 		# Prevent users from making typos or guessing words not on the board
-	# 		if word_list.count(response)==0:
-	# 			print("\""+response+"\" isn't on the board! Try again.")
-	# 		else: 
-	# 			# response = response.lower()
-	# 			processGuess(response)
-	
-	# processGuess(guess)
-
-	# valid_response=False
-	# if (current_team==BLUE_TEAM and blue_spy_human) or (current_team==RED_TEAM and red_spy_human):
-	# 	printWordGrid()
-	# 	while not valid_response:
-	# 		response = ""
-	# 		if py3:
-	# 			response = input("What word would you like to guess?\n")
-	# 		else:
-	# 			response = raw_input("What word would you like to guess?\n")
-
-	# 		response = response.strip()
-	# 		response = response.capitalize()
-	# 		# Prevent users from making typos or guessing words not on the board
-	# 		if word_list.count(response)==0:
-	# 			print("\""+response+"\" isn't on the board! Try again.")
-	# 		else: 
-	# 			# response = response.lower()
-	# 			# processGuess(response)
-	# 			guess = response
-	# 			valid_response=True
-	# elif current_team==BLUE_TEAM and not blue_spy_human:
-	# 	query = clue.lower()
-	# 	guess = blue_ai_agent.makeGuesses(word_list, guessed,query,clue_num)
-	# elif current_team==RED_TEAM and not red_spy_human:
-	# 	query = clue.lower()
-	# 	guess = red_ai_agent.makeGuesses(word_list, guessed,query,clue_num)
-	# else:
-	# 	print("This shouldn't be a thing for guessing")
-
-
-
-#Processes a hint given by the spy master (the player)
-def processPrompt(response,number):
-	#Format response for processing
-	query = response.lower()
-	# clue = "dummy clue"
-	# clue_num = 1
-
-	#Get sim_matrix
-
-	#Get index of query in sim_matrix
-	#Find corres. vector in sim_matrix
-	#Argmax sorting
-	#Iterate through results
-		#If result is in the word_list, add to list of guesses until is length [number]
-	#
-
-	#Edge case = only 1 word left on board
-
-	#Need to check similarities with assasin and opponent's words
-
-	# return clue, clue_num
-
 #Returns a team number as a team string because lazy
 def getTeamString(team_num):
 	if team_num == BLUE_TEAM:
@@ -569,10 +526,14 @@ def endGame():
 	# print("\t Civilian words: "+str(red_words))
 	print("\t The assasian word was "+assasian_word)
 
+	print("\n")
+
 	#Check for win/lose conditions
 
+	#TODO
 	#Have the AI save their Rocchios in case they were modified during the game
 
+	# LEAVE THESE COMMENTS HERE
 	# if not blue_master_human:
 	# 	print("The blue spymaster is being dismissed...")
 	# 	blue_ai_master.saveRocchios()
@@ -602,57 +563,18 @@ def gameLoop():
 		# 	id_num = word_grid.get(word_test)
 		# 	print("Word: "+word_test+", ID:  "+str(id_num))
 
-		print("[Current turn: "+getTeamString(current_team)+", MASTER]\n")
+		# print("[Current turn: "+getTeamString(current_team)+", SPY MASTER]\n")
 
+		#Get clue from spy master
 		clue, clue_num = getPrompt()
-		# processPrompt(clue, clue_num)
-
-		# print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
-		# print("Your clue is: "+clue+" "+str(clue_num))
-		getGuess(clue,clue_num)
-		# guess = getGuess(clue,clue_num)
-		# processGuess(guess)
-
 		
-
-		# if is_spy_master==False:
-		# 	response = input("What word would you like to guess?\n")
-		# 	response = response.strip()
-		# 	response = response.capitalize()
-		# 	# Prevent users from making typos or guessing words not on the board
-		# 	if word_list.count(response)==0:
-		# 		print("\""+response+"\" isn't on the board! Try again.")
-		# 	else: 
-		# 		# response = response.lower()
-		# 		processGuess(response)
-		# else:
-		# 	response = input("What prompt would you like to give?\n")
-		# 	#Format prompt for rule-checking
-		# 	response = response.strip()
-		# 	temp = response
-		# 	# temp.replace("_", " ")
-		# 	# temp.replace("-", " ")
-		# 	# temp.replace(" ", "")
-		# 	# ^isalpha() takes care of most of these
-		# 	temp = temp.capitalize()
-		# 	#Rule-check
-		# 	if word_list.count(temp)==1 and guessed[word_list.index(temp)]==0:
-		# 		print("Hey, \""+response+"\"  is on the board already! You can't use that as a clue! Try a different one.")
-		# 	elif temp.count(" ")>0:
-		# 		print("You can only provide one word as a clue! Try a different one.")
-		# 	elif not temp.isalpha():
-		# 		print("Hey now, you can't put non-alphabet characters in your clue! Try a different one.")
-		# 	else: 
-		# 		number = input("How many words are there?\n")
-		# 		if not number.isdigit():
-		# 			print("Hey, this isn't a number! Now you have to start over because user edge-cases are annoying to handle =(")
-		# 		else: 
-		# 			# response = response.lower()
-		# 			processPrompt(response,number)			
-			# if word_list.count(temp)==1 && guessed(word_list.index(temp))==0:
-			# 	print("Hey, that word is on the board! You can't use that as a clue! Try a different one.")
-			# else: processPrompt(response,number)
+		#Give clue to spy agents + process it
+		takeGuess(clue,clue_num)
+		
+		#Switch to next team
 		current_team = (current_team+1)%2
+
+		print("\n")
 
 
 
@@ -662,9 +584,7 @@ def main():
 	global blue_spy_human
 	global red_master_human
 	global red_spy_human
-	
-	# TODO ask if there are human players for both teams
-	# TODO ask which team the player wants to be on if only one team has human players
+
 
 	response = ""
 		
@@ -672,16 +592,16 @@ def main():
 	valid_response = False
 	while not valid_response:
 		if py3:
-			response = input("Will there be a human spy master for the blue team? [Yes/No]\n")
+			response = input("Will there be a human spy master for the blue team? [(Y)es/(N)o]\n")
 		else:
-			response = raw_input("Will there be a human spy master for the blue team? [Yes/No]\n")
+			response = raw_input("Will there be a human spy master for the blue team? [(Y)es/(N)o]\n")
 		response = response.strip()
 		response = response.capitalize()
-		if response == "Yes":
+		if response == "Yes" or response == "Y":
 			blue_master_human = True
 			print("Humans will be the spy master for the blue team\n")
 			valid_response=True
-		elif response == "No":
+		elif response == "No" or response == "N":
 			blue_master_human = False
 			print("An AI will be the spy master for the blue team\n")
 			valid_response=True
@@ -692,16 +612,16 @@ def main():
 	valid_response = False
 	while not valid_response:
 		if py3:
-			response = input("Will there be human agents for the blue team? [Yes/No]\n")
+			response = input("Will there be human agents for the blue team? [(Y)es/(N)o]\n")
 		else:
-			response = raw_input("Will there be human agents for the blue team? [Yes/No]\n")
+			response = raw_input("Will there be human agents for the blue team? [(Y)es/(N)o]\n")
 		response = response.strip()
 		response = response.capitalize()
-		if response == "Yes":
+		if response == "Yes" or response == "Y":
 			blue_spy_human = True
 			print("Human agents will be on the blue team\n")
 			valid_response=True
-		elif response == "No":
+		elif response == "No" or response == "N":
 			blue_spy_human = False
 			print("AI agents be on the blue team\n")
 			valid_response=True
@@ -712,16 +632,16 @@ def main():
 	valid_response = False
 	while not valid_response:
 		if py3:
-			response = input("Will there be a human spy master for the red team? [Yes/No]\n")
+			response = input("Will there be a human spy master for the red team? [(Y)es/(N)o]\n")
 		else:
-			response = raw_input("Will there be a human spy master for the red team? [Yes/No]\n")
+			response = raw_input("Will there be a human spy master for the red team? [(Y)es/(N)o]\n")
 
 		response = response.capitalize()
-		if response == "Yes":
+		if response == "Yes" or response == "Y":
 			red_master_human = True
 			print("Humans will be the spy master for the red team\n")
 			valid_response=True
-		elif response == "No":
+		elif response == "No" or response == "N":
 			red_master_human = False
 			print("An AI will be the spy master for the red team\n")
 			valid_response=True
@@ -732,15 +652,15 @@ def main():
 	valid_response = False
 	while not valid_response:
 		if py3:
-			team_req = input("Will there be human agents for the red team? [Yes/No]\n")
+			team_req = input("Will there be human agents for the red team? [(Y)es/(N)o]\n")
 		else:
-			team_req = raw_input("Will there be human agents for the red team? [Yes/No]\n")
+			team_req = raw_input("Will there be human agents for the red team? [(Y)es/(N)o]\n")
 		team_req = team_req.capitalize()
-		if team_req == "Yes":
+		if team_req == "Yes" or team_req == "Y":
 			red_spy_human = True
 			print("Human agents will be on the red team\n")
 			valid_response=True
-		elif team_req == "No":
+		elif team_req == "No" or team_req == "N":
 			red_spy_human = False
 			print("AI agents be on the red team\n")
 			valid_response=True
@@ -752,7 +672,7 @@ def main():
 	game_state = GAME_IN_PROGRESS #TODO Should this be defined here?
 	#Start the loop
 	gameLoop()
-	print("Bye =3 xx3")
+	# print("Bye =3 xx3")
 
 
 
@@ -774,20 +694,22 @@ if __name__ == "__main__":
 		while not valid_response:
 			respone = ""
 			if py3:
-				response = input("Would you like to play again?[Yes/No]")
+				response = input("Would you like to play again?[(Y)es/(N)o]")
 			else: 
-				response = raw_input("Would you like to play again?[Yes/No]")
+				response = raw_input("Would you like to play again?[(Y)es/(N)o]")
 			response = response.strip()
 			response = response.capitalize()
-			if response == "Yes":
+			if response == "Yes" or response == "Y":
 				game_state=GAME_RESET
 				valid_response=True
 				print("Another game will be started then!\n")
-			elif response == "No":
+			elif response == "No" or response == "N":
 				game_state=GAME_END
 				valid_response=True
 				print("Thanks for playing! =D\n")
 			else: print("Sorry, I didn't understand that. Try again?\n")
+
+		print("\n")
 
 
 # 

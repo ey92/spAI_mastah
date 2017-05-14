@@ -39,7 +39,8 @@ class spyPlayer():
 		sim_mat = np.empty([400,6459])
 		for x in range(0,NUM_SIM_PICKLES):
 			with open(SIM_PICKLE_HEAD+str(1)+".pickle",'rb') as f:
-				sim_mat = pickle.load(f)
+				new_mat = pickle.load(f)
+				sim_mat = np.concatenate((sim_mat,new_mat),axis=1)
 
 		return sim_mat
 		
@@ -223,24 +224,22 @@ class spyMaster(spyPlayer):
 		for i in range(len(top_team_idxs)):
 			if i < len(top_team_idxs):
 				for j in range(n):
-					if j < len(top_team_idxs[0]):
+					if j < len(top_team_idxs[i]):
 						try:
-							top_team_idxs[i][j]
-						
-							for k in range(len(top_team_idxs)):
-								if k < len(top_team_idxs):
-									if top_team_idxs[i][j] in top_team_idxs[k]:
-										counts[i][j]+=1
-								if k < len(top_opp_idxs):
-									if top_team_idxs[i][j] in top_opp_idxs[k]:
-										counts[i][j]-=0.8
-								if k < len(top_civ_idxs):
-									if top_team_idxs[i][j] in top_civ_idxs[k]:
-										 counts[i][j]-=0.3
+							nom = top_team_idxs[i][j]
 						except:
-							print(i,j,k)
-							# print(top_team_idxs[i])
-#                             print(top_team_idxs[k])
+							nom = top_team_idx[0][i][j]
+						
+						for k in range(len(top_team_idxs)):
+							if k < len(top_team_idxs):
+								if nom in top_team_idxs[k]:
+									counts[i][j]+=1
+							if k < len(top_opp_idxs):
+								if nom in top_opp_idxs[k]:
+									counts[i][j]-=0.8
+							if k < len(top_civ_idxs):
+								if nom in top_civ_idxs[k]:
+									 counts[i][j]-=0.3
 		# top indices for each word in team words
 		cts_idx = [np.argmax(z) for z in counts]
 		top_cts = [counts[i][cts_idx[i]] for i in range(len(cts_idx))]
@@ -297,8 +296,9 @@ class spyAgent(spyPlayer):
 		for rel_word in rel_words:
 			#Get sim vector of rel_word
 			print(rel_word)
+			rel_word=rel_word.lower()
 			rel_idx = self.bankword_to_idx.get(rel_word)
-			print(str(rel_idx))
+			print(str(rel_idx))			
 			rel_vector = self.sim_matrix[rel_idx]
 			beta_term+=rel_vector		
 		#Account for divide by zero
@@ -309,7 +309,8 @@ class spyAgent(spyPlayer):
 		#For each irrelevant word
 		for irrel_word in irrel_words:
 			#Get sim vector of irrel_word
-			irrel_idx = self.bankword_to_idx.get(irrel_word)
+			irrel_word=irrel_word.lower()
+			irrel_idx = self.bankword_to_idx.get(irrel_word)			
 			irrel_vector = self.sim_matrix[irrel_idx]
 			gamma_term+=irrel_vector
 		#Account for divide by zero

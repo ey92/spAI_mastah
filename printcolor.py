@@ -48,12 +48,19 @@ CWHITEBG2  = '\33[107m'
 
 #format is color+bg+text+end
 # text = colored('hi','red','on_grey')
-
-def colorprint(text,color,bg=None,bold=False):
-	if bold:
-		print(color+bg+CBOLD+text)
-	else:
-		print(color+bg+text)
+def colorprint(text,color,bg=True,bold=True):
+	for i in range(len(color)):
+		if color[i]==None:
+			text[i] = "\t"+CWHITE+CBOLD+text[i]
+		else:
+			if bold:
+				text[i] = "\t"+CWHITE+color[i]+CBOLD+text[i]
+			else:
+				text[i] = "\t"+CWHITE+color[i]+text[i]
+				
+	col_width = max(len(word) for word in text) + 5
+	printText = "".join(word.ljust(col_width) for word in text)
+	print(printText+END)
 
 def endColor():
 	print(END)
