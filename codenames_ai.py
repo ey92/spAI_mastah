@@ -10,8 +10,12 @@ CODEWORDS_PICKLE = "knowledge/idx_to_codeword.pickle"
 INVERTED_CODEWORDS_PICKLE = "knowledge/codeword_to_idx.pickle"
 
 SIM_PICKLE_HEAD = "knowledge/sim_matrix"
-RELEVANT_PICKLE = "knowledge/relevant.pickle"
-IRRELEVANT_PICKLE = "knowledge/irrelevant.pickle"
+RELEVANT_PICKLE = "knowledge/relevant_rocchio.pickle"
+IRRELEVANT_PICKLE = "knowledge/irrelevant_rocchio.pickle"
+
+ALPHA_ROCC = 0.3
+BETA_ROCC = 0.3
+GAMMA_ROCC = 0.8
 
 class spyPlayer():
 	def __init__(self, team_num):
@@ -138,7 +142,7 @@ class spyPlayer():
 			pickle.dump(original_irrel,f)
 
 
-class spyMaster(spyPlayer):
+class spyMaster(spyPlayer):	
 
 	def interpretGameboard(self,word_grid):
 		"""Returns a 4-tuple of the words REMAINING for the spy master's team, 
@@ -216,6 +220,47 @@ class spyAgent(spyPlayer):
 		
 		return not_guessed
 
+	def computeRocchio(word):
+		rel_words = self.rel_pool.get(word,[])
+		irrel_words = self.irrel_pool.get(word,[])
+		# mod_vec = np.empty([17000]) #TODO Replace
+		# alpha_term = np.empty([17000]) #TODO Replace
+		# beta_term = np.empty([17000]) #TODO Replace
+		# gamma_term = np.empty([17000]) #TODO Replace
+		
+		#Get sim vector for word, mult. by alpha term
+		# sim_vector = np.empty([17000]) #TODO Replace
+		sim_idx = self.bankword_to_idx.get(word)
+		sim_vector = self.sim_matrix[sim_idx]
+		alpha_term = ALPHA_ROCC*sim_vector
+
+		#For each relevant word
+		for rel_word in rel_words:
+			#Get sim vector of rel_word
+			rel_idx = self.bankword_to_idx.get(rel_word)
+			rel_vector = self.sim_matrix[rel_idx]
+			beta_term+=rel_vector
+		b_frac = BETA_ROCC/len(rel_words)
+		beta_term = b_frac*beta_term
+
+		#For each irrelevant word
+		for irrel_word in irrel_words:
+			#Get sim vector of irrel_word
+			irrel_idx = self.bankword_to_idx.get(irrel_word)
+			irrel_vector = self.sim_matrix[irrel_idx]
+			gamma_term+=irrel_vector
+		c_frac = GAMMA_ROCC/len(irrel_words)
+		gamma_term = c_frac*gamma_term
+
+		#Calculate updated query
+		mod_vec = alpha_term + beta_term - gamma_term
+
+		#Lowest value allowed is 0
+		for i in range(0,mod_vec.size):
+			mod_vec[i] = max(0,mod_vec[i])
+
+		return mod_vec
+
 	# NOTE: returns a LIST of guesses, must be iterated through in order to process in main game
 	def makeGuesses(self,word_list, guessed,clue,num_words):
 		guesses = []
@@ -223,21 +268,32 @@ class spyAgent(spyPlayer):
 		# USE INSTEAD OF WORD_LIST
 		word_choices = self.getNonGuessed(word_list, guessed)
 
+		# print(self.sim_matrix)
+
 		# Get sim vector for the clue
 		clue_idx = self.bankword_to_idx.get(clue)
+		# print(clue_idx)
 		clue_vec = self.sim_matrix[clue_idx]
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue
-		mod_clue_vec = clue_vec # TODO Rocchio
+		mod_clue_vec = computeRocchio(clue) #clue_vec # TODO Rocchio
+
+		# print("Mod vector")
+		# print(mod_clue_vec)
 
 		# Get argsort of resulting vector as ranking
 		ranking = np.argsort(mod_clue_vec)
+		#Change from ascending to descending order
+		ranking = np.flip(ranking,0)
+		# print("Ranking")
+		# print(ranking)
 
 		counter = 0
 		while len(guesses)<num_words:
 			code_check = ranking[counter]
-			codeword = idx_to_codeword[code_check] 
-			if word_choices.count(codeword) ==1:guesses.append(codeword)
+			# print(code_check)
+			codeword = self.idx_to_codeword[code_check] 
+			if word_choices.count(codeword) ==1: guesses.append(codeword)
 			counter+=1
 
 		# While len(guesses) < num_words
