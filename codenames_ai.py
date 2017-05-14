@@ -26,7 +26,7 @@ class spyPlayer():
     def generateSimMatrix():
     	"""Returns a numpy array mapping Codename words to other possible words"""
     	sim_mat = np.empty([400,6459])
-			with open(SIM_PICKLE_HEAD+str("1"),'rb') as f:
+			with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
         sim_mat = pickle.load(f)
 
      	return sim_mat
