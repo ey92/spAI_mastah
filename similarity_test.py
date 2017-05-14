@@ -11,7 +11,7 @@ irrelevant = {}
 # 
 
 # Only allowed to give one word guesses, so only concerned with one-word entries
-all_lemmas = [i for i in wn.all_lemma_names() if i.count("_")==0] and i.isalpha()]
+all_lemmas = [i for i in wn.all_lemma_names() if i.count("_")==0 and i.isalpha()]
 all_lemmas = sorted(all_lemmas)
 #all_lemmas is the indexing order for the corress. similarity matrix
 num_lemmas = len(all_lemmas)

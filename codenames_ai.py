@@ -14,10 +14,10 @@ IRRELEVANT_PICKLE = "knowledge/irrelevant.pickle"
 
 class spyPlayer():
 	def __init__(self, team_num):
+		self.team_num = team_num
     self.sim_matrix = self.generateSimMatrix()
     self.rel_pool = self.generateRelRocchio()
-    self.irrel_pool = self.generateIrrelRocchio()
-    self.team_num = team_num
+    self.irrel_pool = self.generateIrrelRocchio()    
     self.idx_to_bankword = self.generateBankWordMap()
     self.bankword_to_idx = self.generateInvertedBankWord()
 		self.idx_to_codeword = self.generateCodeWordMap()
@@ -25,10 +25,13 @@ class spyPlayer():
 
     def generateSimMatrix():
     	"""Returns a numpy array mapping Codename words to other possible words"""
-    	
-    	#Should trim it such that only contains the words pertaining to the game
-    	pass
+    	sim_mat = np.empty([400,6459])
+			with open(SIM_PICKLE_HEAD+str("1"),'rb') as f:
+        sim_mat = pickle.load(f)
 
+     	return sim_mat
+    	
+    	#Should trim it such that only contains the words pertaining to the game?
     def generateRelRocchio():
     	rel_dict = {}
 			with open(RELEVANT_PICKLE,'rb') as f:
@@ -144,50 +147,9 @@ class spyMaster(spyPlayer):
 
 		return team_words, opp_words, civ_words, boom_word
 
-
-	# def getTeamWords(word_grid):
-	# 	"""Returns a list of the words REMAINING for the spy master's team
-	# 	   Note: Already guessed words are noted by a negative sign"""
-	# 	team_words = []
-	# 	for word in word_grid.keys():
-	# 		if word_grid.get(word) == self.team_num: team_words.append(word)
-
-	# 	return team_words
-    	
-
- #    def getOppWords(word_grid):
- #    	"""Returns a list of the words REMAINING for the opposing team
-	# 	   Note: Already guessed words are noted by a negative sign"""
- #    	opp_num = (self.team_num+1)%2
- #    	opp_words = []
-	# 	for word in word_grid.keys():
-	# 		if word_grid.get(word) == self.opp_num: opp_words.append(word)
-
-	# 	return opp_words
-
-	# def getCivWords(word_grid):
- #    	"""Returns a list of the words REMAINING civilian words
-	# 	   Note: Already guessed words are noted by a negative sign"""
- #    	civ_num = 2
- #    	civ_words = []
-	# 	for word in word_grid.keys():
-	# 		if word_grid.get(word) == self.civ_num: civ_words.append(word)
-
-	# 	return opp_words
-
-	# def getBoomWord(word_grid):
- #    	"""Returns a list of the words REMAINING civilian words
-	# 	   Note: Already guessed words are noted by a negative sign"""
- #    	boom_num = 3
- #    	boom_words = []
-	# 	for word in word_grid.keys():
-	# 		if word_grid.get(word) == self.boom_num: boom_words.append(word)
-
-	# 	return boom_words
-
   def createClue(word_list, word_grid):
-  	"""
-  		game_board: dictionary containing the "identity of each word"
+  	"""Creates a clue based off the state of the gameboard [word_grid]
+  		word_grid: dictionary containing the "identity of each word"
   	"""
   	clue = ""
   	clue_num = 1
