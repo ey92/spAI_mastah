@@ -71,6 +71,53 @@ class spyPlayer():
 
      	return wordmap
 
+    def getRelevantEntry(word):
+			return self.rel_pool.get(word,[])
+
+		def getIrrelevantEntry(word):
+			return self.irrel_pool.get(word,[])
+
+		def addRelevantEntry(word,rel_entry):
+			temp = getRelevantEntry(word)
+			temp.append(rel_entry)
+			self.rel_pool.update({word:temp})
+
+		def addIrelevantEntry(word,irrel_entry):
+			temp = getIrrelevantEntry(word)
+			temp.append(irrel_entry)
+			self.irrel_pool.update({word:temp})
+
+		def saveRocchios():
+			original_rel = self.generateRelRocchio()
+			original_irrel = self.generateIrrelRocchio()
+
+			#Update original relevant rocchio with only NEW entries made during the game 
+			#Done this way to prevent lose of data from overwritting from multiple AI
+			for entry in self.rel_pool.keys():
+				original_list = original_rel.get(entry,[])
+				new_list = self.getRelevantEntry(entry)
+				for new_word in new_list:
+					if original_list.count(new_word)==0: original_list.append(new_word)
+
+				original_rel.update({entry:original_list})
+
+			with open(RELEVANT_PICKLE,'wb') as f:
+        pickle.dump(original_rel,f)
+
+
+      #Update original irrelevant rocchio with only NEW entries made during the game 
+			#Done this way to prevent lose of data from overwritting from multiple AI
+			for entry in self.irrel_pool.keys():
+				original_list = original_irrel.get(entry,[])
+				new_list = self.getIrrelevantEntry(entry)
+				for new_word in new_list:
+					if original_list.count(new_word)==0: original_list.append(new_word)
+
+				original_irrel.update({entry:original_list})
+
+			with open(IRRELEVANT_PICKLE,'wb') as f:
+        pickle.dump(original_irrel,f)
+
 
 class spyMaster(spyPlayer):
 
@@ -146,6 +193,10 @@ class spyMaster(spyPlayer):
   	clue_num = 1
 
   	team_words, opp_words, civ_words, boom_word = self.interpretGameboard(word_grid)
+
+  	#Find words most relevant to each other
+
+  	#Rocchio away the synonyms of the opp_words, civ_words, and boom_word
   	
   	return clue, clue_num
 
@@ -167,20 +218,30 @@ class spyAgent(spyPlayer):
   def makeGuesses(word_list, guessed,clue,num_words):
   	guesses = []
 
+  	# USE INSTEAD OF WORD_LIST
   	word_choices = self.getNonGuessed(word_list, guessed)
 
   	# Get sim vector for the clue
-  	clue_vec = self.idx_to_bankword
+  	clue_idx = self.bankword_to_idx.get(clue)
+  	clue_vec = self.sim_matrix[clue_idx]
 
-  	# Rocchio with sim vectors for synonyms of the clue
+  	# Rocchio with sim vectors for synonyms and antonyms of the clue
+  	mod_clue_vec = clue_vec # TODO Rocchio
 
   	# Get argsort of resulting vector as ranking
+  	ranking = np.argsort(mod_clue_vec)
+
+  	counter = 0
+  	while len(guesses)<num_words:
+  		code_check = ranking[counter]
+  		codeword = idx_to_codeword[code_check] 
+  		if word_choices.count(codeword) ==1:guesses.append(codeword)
+  		counter+=1
 
   	# While len(guesses) < num_words
 	  	#Iterate through ranking via counter
 	  	#if idx_to_codeword[counter] is in word_list
 	  		#Append result to guesses
-
 
   	return guesses
 

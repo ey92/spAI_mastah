@@ -21,6 +21,11 @@ GAME_END = 3
 game_state = GAME_START
 is_spy_master = False
 human_team = BLUE_TEAM
+# blue_master_human = False
+# blue_spy_human = False
+# red_master_human = False
+# red_spy_human = False
+
 current_team = BLUE_TEAM
 red_words = 8
 blue_words = 8
@@ -282,6 +287,7 @@ def gameLoop():
 		# 	print("Word: "+word_test+", ID:  "+str(id_num))
 
 		print("[Current turn: "+getTeamString(current_team)+"]\n")
+
 		# clue, clue_num = getPrompt()
 		# processPrompt(clue, clue_num)
 
