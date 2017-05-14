@@ -316,9 +316,9 @@ def getHumanPrompt():
 	
 	while not clue_done:
 		if py3:
-			clue = input("What prompt would you like to give?\n")
+			clue = input("Spy Master, what prompt would you like to give?\n")
 		else:
-			clue = raw_input("What prompt would you like to give?\n")
+			clue = raw_input("Spy Master, what prompt would you like to give?\n")
 		clue = clue.strip().lower()
 		
 		temp = clue
@@ -369,39 +369,39 @@ def getHumanPrompt():
 
 # Gets a prompt/clue from the spymaster, human or AI
 def getPrompt():
-    # Need to check current team
-    #If human is the spy master and if it's their tur
-    global blue_ai_master
-    global red_ai_master
+	# Need to check current team
+	#If human is the spy master and if it's their tur
+	global blue_ai_master
+	global red_ai_master
 
-    print("[Current turn: "+getTeamString(current_team)+", SPY MASTER]\n")
-    
-    clue = ""
-    clue_num = 0
-    
-    if current_team == BLUE_TEAM:
-        # print("[Current Team: Blue Team]")
+	print("[Current turn: "+getTeamString(current_team)+", SPY MASTER]\n")
+	
+	clue = ""
+	clue_num = 0
+	
+	if current_team == BLUE_TEAM:
+		# print("[Current Team: Blue Team]")
 
-        # blue spy master stuff
-        # print("It is Blue Spy Master's Turn")
+		# blue spy master stuff
+		# print("It is Blue Spy Master's Turn")
 
-        if not blue_master_human:
-        	print("The blue spy master is thinking...\n")
-            return blue_ai_master.createClue(word_list,word_grid)
-        else:
-            return getHumanPrompt()
-    else:
-        # print("[Current Team: Blue Team]")
-        
-        # red spy master stuff
-        # print("It is Red Spy Master's Turn")
-        if not red_master_human:
-        	print("The red spy master is thinking...\n")
-            return red_ai_master.createClue(word_list,word_grid)
-        else:
-            return getHumanPrompt()
+		if not blue_master_human:
+			print("The blue spy master is thinking...\n")
+			return blue_ai_master.createClue(word_list,word_grid)
+		else:
+			return getHumanPrompt()
+	else:
+		# print("[Current Team: Blue Team]")
+		
+		# red spy master stuff
+		# print("It is Red Spy Master's Turn")
+		if not red_master_human:
+			print("The red spy master is thinking...\n")
+			return red_ai_master.createClue(word_list,word_grid)
+		else:
+			return getHumanPrompt()
 
-    return clue, clue_num
+	return clue, clue_num
 
 #Returns a guess made by the players (human or AI) based off the clue
 def takeGuess(clue,clue_num):
@@ -415,14 +415,15 @@ def takeGuess(clue,clue_num):
 		if (current_team==BLUE_TEAM and blue_spy_human) or (current_team==RED_TEAM and red_spy_human):
 			printWordGrid(SPY_VIEW)
 			# print("[Current turn: "+getTeamString(current_team)+", AGENTS]\n")
+			print("Your clue is: "+clue+" "+str(num_guesses))
 			valid_response=False
 			while not valid_response:				
-				print("Your clue is: "+clue+" "+str(num_guesses))
+				
 				response = ""
 				if py3:
-					response = input("What word would you like to guess? [Number of guesses left:"+str(num_guesses)+"]\n")
+					response = input("Agents, what word would you like to guess? [Number of guesses left: "+str(num_guesses)+"]\n")
 				else:
-					response = raw_input("What word would you like to guess? [Number of guesses left:"+str(num_guesses)+"]\n")
+					response = raw_input("Agents, what word would you like to guess? [Number of guesses left: "+str(num_guesses)+"]\n")
 
 				response = response.strip()
 				response = response.capitalize()
@@ -430,8 +431,6 @@ def takeGuess(clue,clue_num):
 				if word_list.count(response)==0:
 					print("\""+response+"\" isn't on the board! Try again.")
 				else: 
-					# response = response.lower()
-					# processGuess(response)
 					guess = response
 					valid_response=True
 					num_guesses-=1
@@ -453,7 +452,8 @@ def takeGuess(clue,clue_num):
 		guess = guess.capitalize()
 		print("The agents guessed: "+guess)
 		result = processGuess(guess,current_team)
-		# If endTurn==True
+		
+		# If endTurn==True, then end the turn
 		if result: 
 			num_guesses=0
 		
@@ -671,6 +671,9 @@ def main():
 	#Create game elements
 	createGame()
 	game_state = GAME_IN_PROGRESS #TODO Should this be defined here?
+
+	print("Here is the game board: \n")
+	printWordGrid(SPY_VIEW)
 	#Start the loop
 	gameLoop()
 	# print("Bye =3 xx3")
@@ -695,9 +698,9 @@ if __name__ == "__main__":
 		while not valid_response:
 			respone = ""
 			if py3:
-				response = input("Would you like to play again?[(Y)es/(N)o]")
+				response = input("Would you like to play again?[(Y)es/(N)o]\n")
 			else: 
-				response = raw_input("Would you like to play again?[(Y)es/(N)o]")
+				response = raw_input("Would you like to play again?[(Y)es/(N)o]\n")
 			response = response.strip()
 			response = response.capitalize()
 			if response == "Yes" or response == "Y":
