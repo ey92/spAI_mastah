@@ -134,6 +134,8 @@ def printWordGrid(game_view):
 				else:
 					word_id = word_grid.get(print_word)
 					col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
+
+			col.endColor()
 			# if guessed[position]==0:
 			# 	# col.colorprint()
 			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
@@ -287,8 +289,6 @@ def processGuess(response,team_id):
 
 	return endTurn
 
-
-<<<<<<< HEAD
 def getHumanPrompt():
 	clue = ""
 	clue_num = 0
@@ -345,8 +345,7 @@ def getHumanPrompt():
 			
 	return clue, clue_num
 
-=======
->>>>>>> 9ddf898119f9bd2aa6d4bdec285246f2ba3f5e48
+
 # Gets a prompt/clue from the spymaster, human or AI
 def getPrompt():
 	clue = "dummy clue"

@@ -51,9 +51,9 @@ CWHITEBG2  = '\33[107m'
 
 def colorprint(text,color,bg=None,bold=True):
 	if bold:
-		print(color+bg+CBOLD+text)
+		print(color+bg+CBOLD+text, end="")
 	else:
-		print(color+bg+CBOLD+text)
+		print(color+bg+CBOLD+text, end="")
 
 def endColor():
 	print(END)
