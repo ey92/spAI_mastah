@@ -49,11 +49,11 @@ CWHITEBG2  = '\33[107m'
 #format is color+bg+text+end
 # text = colored('hi','red','on_grey')
 
-def colorprint(text,color,bg=None,bold=True):
+def colorprint(text,color,bg=None,bold=False):
 	if bold:
-		print(color+bg+CBOLD+text, end="")
+		print(color+bg+CBOLD+text)
 	else:
-		print(color+bg+CBOLD+text, end="")
+		print(color+bg+text)
 
 def endColor():
 	print(END)

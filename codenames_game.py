@@ -4,6 +4,7 @@ import numpy as np
 import random
 import codenames_ai as ai
 from sys import version_info as vi
+import printcolor as col
 
 py3 = False
 
@@ -16,10 +17,10 @@ ASSASIAN = 3
 #For color-printing
 MASTER_VIEW = 0
 SPY_VIEW = 1
-BLUE_CARD_COLOR = col.CBLUEBG #Blue
-RED_CARD_COLOR = col.CREDBG #Red
-CIV_CARD_COLOR = col.CGREENBG #Green
-BOOM_CARD_COLOR = col.CYELLOWBG #Yellow
+BLUE_CARD_COLOR = col.CBLUEBG2 #Blue
+RED_CARD_COLOR = col.CREDBG2 #Red
+CIV_CARD_COLOR = col.CGREENBG2 #Green
+BOOM_CARD_COLOR = col.CYELLOWBG2 #Yellow
 GUESSED_COLOR = col.CBLACK #Black
 TEXT_COLOR = col.CGREY
 
@@ -135,14 +136,14 @@ def printWordGrid(game_view):
 					word_id = word_grid.get(print_word)
 					col.colorprint(print_word+"\t\t",GUESSED_COLOR,getIdColor(word_id))
 
-			col.endColor()
 			# if guessed[position]==0:
 			# 	# col.colorprint()
 			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
 			# else:
 			# 	print(word_list[position]+str(guessed[position])+"\t\t", end="")
 
-		print("\n")
+		# print("\n")
+	col.endColor()
 
 	print("Blue words left: "+str(blue_words))
 	print("Red words left: "+str(red_words))
@@ -348,69 +349,35 @@ def getHumanPrompt():
 
 # Gets a prompt/clue from the spymaster, human or AI
 def getPrompt():
-	clue = "dummy clue"
-	clue_num = 1
+    # Need to check current team
+    #If human is the spy master and if it's their tur
+    global blue_ai_master
+    global red_ai_master
+    
+    clue = ""
+    clue_num = 0
+    
+    if current_team == BLUE_TEAM:
+        print("[Current Team: Blue Team]")
 
-	valid_response=False
-	if (current_team==BLUE_TEAM and blue_master_human) or (current_team==RED_TEAM and red_master_human):
-		printWordGrid()
-		while not valid_response:
-			response = ""
-			if py3:
-				response = input("What prompt would you like to give?\n")
-			else:
-				response = raw_input("What prompt would you like to give?\n")
-			
-			#Format prompt for rule-checking
-			response = response.strip()
-			temp = response
-			# temp = temp.capitalize()
-			dict_check = True
-			if current_team==BLUE_TEAM and not blue_spy_human: 
-				temp = temp.lower()
-				exists = blue_ai_agent.bankword_to_idx.get(temp)
-				if exists==None: dict_check= False
-			elif current_team==RED_TEAM and not red_spy_human:
-				temp = temp.lower()
-				exists = red_ai_agent.bankword_to_idx.get(temp)
-				if exists==None: dict_check= False
+        # blue spy master stuff
+        print("It is Blue Spy Master's Turn")
 
-			temp = temp.capitalize()
-				
-			#Rule-check
-			if word_list.count(temp)==1 and guessed[word_list.index(temp)]==0:
-				print("Hey, \""+response+"\"  is on the board already! You can't use that as a clue! Try a different one.")
-			elif temp.count(" ")>0:
-				print("You can only provide one word as a clue! Try a different one.")
-			elif not temp.isalpha():
-				print("Hey now, you can't put non-alphabet characters in your clue! Try a different one.")
-			elif not dict_check:
-				print("\""+temp+"\" doesn't exist in the agents' vocabulary! Can you try a different one instead?")
-			else: 
-				number = 0
-				while not valid_response:
-					if py3:
-						number = input("How many words are there?\n")
-					else:
-						number = raw_input("How many words are there?\n")
-					number = number.strip()
-					if not number.isdigit():
-						# print("Hey, this isn't a number! Now you have to start over because user edge-cases are annoying to handle =(")
-						print("Hey, this isn't a number! Try again.")
-					else: 
-						# response = response.lower()
-						# processPrompt(response,number)	
-						clue = temp
-						clue_num = int(number)
-						valid_response=True
-	elif current_team==BLUE_TEAM and not blue_master_human:
-		clue, clue_num = blue_ai_master.createClue(word_list, word_grid)
-	elif current_team==RED_TEAM and not red_master_human:
-		clue, clue_num = red_ai_master.createClue(word_list, word_grid)
-	else:
-		print("This shouldn't be a thing for prompting")
+        if not blue_master_human:
+            return blue_ai_master.createClue(word_list,word_grid)
+        else:
+            return getHumanPrompt()
+    else:
+        print("[Current Team: Blue Team]")
+        
+        # red spy master stuff
+        print("It is Red Spy Master's Turn")
+        if not red_master_human:
+            return red_ai_master.createClue(word_list,word_grid)
+        else:
+            return getHumanPrompt()
 
-	return clue, clue_num
+    return clue, clue_num
 
 #Returns a guess made by the players (human or AI) based off the clue
 def getGuess(clue,clue_num):
