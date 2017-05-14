@@ -174,7 +174,7 @@ class spyMaster(spyPlayer):
         """Creates a clue based off the state of the gameboard [word_grid]
         word_grid: dictionary containing the "identity of each word"
         """
-        n = 10   # num similar words you care about
+        n = 200   # num similar words you care about
         clue = ""
         clue_num = 0
 
@@ -193,7 +193,7 @@ class spyMaster(spyPlayer):
         top_opp_idxs = []
         top_civ_idxs = []
         sorted = self.sim_matrix[boom_index].argsort()[::-1][:]
-        top_boom_idxs = sorted[:n]
+        top_boom_idxs = sorted[:10]
 
         # ind_max = max(len(team_indexs),len(opp_indexs),len(civ_indexs),len(boom_index))
     
@@ -232,16 +232,17 @@ class spyMaster(spyPlayer):
         for i in range(len(top_team_idxs)):
             if i < len(top_team_idxs):
                 for j in range(n):
-                    # if top_team_idxs[i][j] in top_boom_idxs:
-                    # 	continue
                     if j < len(top_team_idxs[0]):
-                        for k in range(n):
-                            if k < len(top_team_idxs) and top_team_idxs[i][j] in top_team_idxs[k]:
-                                counts[i][j]+=1
-#                             if k < len(top_opp_idxs) and top_team_idxs[i][j] in top_opp_idxs[k]:
-#                                 counts[i][j]-=1
-#                             if k < len(top_civ_idxs) and top_team_idxs[i][j] in top_civ_idxs[k]:
-#                                 counts[i][j]-=0.5
+                        for k in range(len(top_team_idxs)):
+                            if k < len(top_team_idxs):
+                                if top_team_idxs[i][j] in top_team_idxs[k]:
+                                    counts[i][j]+=1
+                            if k < len(top_opp_idxs):
+                                if top_team_idxs[i][j] in top_opp_idxs[k]:
+                                    counts[i][j]-=0.8
+                            if k < len(top_civ_idxs):
+                                if top_team_idxs[i][j] in top_civ_idxs[k]:
+                                     counts[i][j]-=0.3
         # top indices for each word in team words
         cts_idx = [np.argmax(z) for z in counts]
         top_cts = [counts[i][cts_idx[i]] for i in range(len(cts_idx))]
@@ -253,7 +254,7 @@ class spyMaster(spyPlayer):
 
 #         print(counts[i][j])
         clue = self.idx_to_bankword[jj]
-        clue_num = counts[i][j]
+        clue_num = np.floor(counts[i][j])
         
 #         for i in range(n):
 #             print(counts[i])
