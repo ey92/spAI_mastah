@@ -13,6 +13,7 @@ CODEWORDS_PICKLE = "knowledge/idx_to_codeword.pickle"
 INVERTED_CODEWORDS_PICKLE = "knowledge/codeword_to_idx.pickle"
 #Similarity matrix mapping "Codename" words to "English" words
 SIM_PICKLE_HEAD = "knowledge/sim_matrix"
+NUM_SIM_PICKLES = 12
 #Dictionary mapping words to lists their related/unrelated words, used for Rocchio algorithm
 RELEVANT_PICKLE = "knowledge/relevant_rocchio.pickle"
 IRRELEVANT_PICKLE = "knowledge/irrelevant_rocchio.pickle"
@@ -36,8 +37,9 @@ class spyPlayer():
 	def generateSimMatrix(self):
 		"""Returns a numpy array mapping Codename words to other possible words"""
 		sim_mat = np.empty([400,6459])
-		with open(SIM_PICKLE_HEAD+str("1")+".pickle",'rb') as f:
-			sim_mat = pickle.load(f)
+		for x in range(0,NUM_SIM_PICKLES):
+			with open(SIM_PICKLE_HEAD+str(1)+".pickle",'rb') as f:
+				sim_mat = pickle.load(f)
 
 		return sim_mat
 		
@@ -336,21 +338,24 @@ class spyAgent(spyPlayer):
 		clue_vec = self.sim_matrix[clue_idx]
 
 		# Rocchio with sim vectors for synonyms and antonyms of the clue
-		mod_clue_vec = self.computeRocchio(clue)
+		query = clue.lower()		
+		mod_clue_vec = self.computeRocchio(query)
 
 		# Get argsort of resulting vector as ranking in descending order
-		ranking = mod_clue_vec.argsort()[::-1][:]
+		ranking = np.argsort(mod_clue_vec)
+		# Change from ascending to descending order
+		ranking = np.flip(ranking,0)		
 
 		#Get most similar words in word_grid
 		counter = 0
 
 		#Only get the number of words guessed
-		while len(guesses) < num_words:
+		while len(guesses) < 1:
 			word_idx = ranking[counter]
 			codeword = self.idx_to_codeword[word_idx] 
+			codeword = codeword.capitalize()
 			#Only append the most similar word if it's on the board
-			if codeword in word_choices: 
-				guesses.append(codeword)
+			if word_choices.count(codeword) ==1: guesses.append(codeword)
 			counter+=1
 
-		return guesses
+		return guesses[0]
